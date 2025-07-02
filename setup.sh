@@ -10,6 +10,12 @@ sudo apt install -y python3-pip
 sudo apt update
 sudo apt install -y zip unzip
 
+# Setup virtual environmsnent
+sudo apt install python3-venv
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
 # Install dependencies
 pip3 install --upgrade pip
 pip3 install -r requirements.txt
@@ -21,7 +27,7 @@ Description=G-Shock Time Server
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/python3 /home/pi/gshock-server-dist/gshock-server.py --multi-watch
+ExecStart=python3 /home/pi/gshock-server-dist/gshock_server.py --multi-watch
 WorkingDirectory=/home/pi/gshock-server-dist
 Restart=always
 User=pi
