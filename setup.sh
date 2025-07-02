@@ -9,6 +9,7 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install -y python3-pip
 sudo apt update
 sudo apt install -y zip unzip
+sudo apt install -y python3-pil python3-setuptools libjpeg-dev zlib1g-dev
 
 # Setup virtual environmsnent
 sudo apt install python3-venv
@@ -18,7 +19,11 @@ pip install -r requirements.txt
 
 # Install dependencies
 pip3 install --upgrade pip
-pip3 install -r requirements.txt
+
+pip3 install pytz
+pip3 install bleak>=1.0
+pip3 install gshock-api>=2.0.6
+pip3 install --break-system-packages luma.oled
 
 # Create and enable systemd service
 cat << EOL | sudo tee /etc/systemd/system/gshock.service > /dev/null
