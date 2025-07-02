@@ -6,7 +6,7 @@ echo "== G-Shock Server Installer for Raspberry Pi Zero =="
 sudo apt update && sudo apt upgrade -y
 
 # Install some tools
-sudo apt install -y python3 python3-pip
+sudo apt install -y python3-pip
 sudo apt update
 sudo apt install -y zip unzip
 
@@ -17,15 +17,14 @@ pip3 install -r requirements.txt
 # Create and enable systemd service
 cat << EOL | sudo tee /etc/systemd/system/gshock.service > /dev/null
 [Unit]
-Description=G-Shock Server Python App
-After=network.target bluetooth.target
+Description=G-Shock Time Server
+After=network.target
 
 [Service]
-Type=simple
+ExecStart=/usr/bin/python3 /home/pi/gshock-server-dist/gshock-server.py
+WorkingDirectory=/home/pi/gshock-server-dist
+Restart=always
 User=pi
-WorkingDirectory=\$(pwd)
-ExecStart=/usr/bin/python3 \$(pwd)/gshock_server.py --multi-watch
-Restart=on-failure
 Environment=PYTHONUNBUFFERED=1
 
 [Install]
