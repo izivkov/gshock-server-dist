@@ -21,7 +21,7 @@ Description=G-Shock Time Server
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/python3 /home/pi/gshock-server-dist/gshock-server.py
+ExecStart=/usr/bin/python3 /home/pi/gshock-server-dist/gshock-server.py --multi-watch
 WorkingDirectory=/home/pi/gshock-server-dist
 Restart=always
 User=pi
@@ -34,4 +34,4 @@ EOL
 sudo systemctl daemon-reload
 sudo systemctl enable gshock.service
 sudo systemctl start gshock.service
-sudo systemctl status gshock.service
+# sudo systemctl status gshock.service
