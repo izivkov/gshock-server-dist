@@ -8,8 +8,8 @@ sudo apt update && sudo apt upgrade -y
 # Install some tools
 sudo apt install -y python3-pip
 sudo apt install -y zip unzip
-sudo apt install libfreetype6-dev
-sudo apt install libjpeg-dev zlib1g-dev libopenjp2-7-dev libtiff5-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python3-tk
+sudo apt install -y libfreetype6-dev
+sudo apt install -y libjpeg-dev zlib1g-dev libopenjp2-7-dev libtiff5-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python3-tk
 
 # Setup virtual environmsnent
 sudo apt install python3-venv
