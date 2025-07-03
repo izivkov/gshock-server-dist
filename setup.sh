@@ -7,9 +7,8 @@ sudo apt update && sudo apt upgrade -y
 
 # Install some tools
 sudo apt install -y python3-pip
-sudo apt update
 sudo apt install -y zip unzip
-sudo apt install -y python3-pil python3-setuptools libjpeg-dev zlib1g-dev
+# sudo apt install -y python3-pil python3-setuptools libjpeg-dev zlib1g-dev
 
 # Setup virtual environmsnent
 sudo apt install python3-venv
@@ -18,7 +17,7 @@ source venv/bin/activate
 
 # Install dependencies
 pip3 install --upgrade pip
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 
 echo ""
 echo "✅ Installation complete!"
