@@ -15,7 +15,7 @@ sudo apt install -y python3-pil python3-setuptools libjpeg-dev zlib1g-dev
 sudo apt install python3-venv
 python3 -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+# pip install -r requirements.txt
 
 # Install dependencies
 pip3 install --upgrade pip
