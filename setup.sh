@@ -29,11 +29,12 @@ Description=G-Shock Time Server
 After=network.target
 
 [Service]
-ExecStart=python3 /home/pi/gshock-server-dist/gshock_server.py --multi-watch
+ExecStart=/home/pi/gshock-server-dist/venv/bin/python /home/pi/gshock-server-dist/gshock_server.py --multi-watch
 WorkingDirectory=/home/pi/gshock-server-dist
-Restart=always
-User=pi
 Environment=PYTHONUNBUFFERED=1
+Restart=on-failure
+RestartSec=5
+User=pi
 
 [Install]
 WantedBy=multi-user.target
