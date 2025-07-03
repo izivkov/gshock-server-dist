@@ -19,11 +19,55 @@ source venv/bin/activate
 
 # Install dependencies
 pip3 install --upgrade pip
+pip3 install pytz 
+# ----------------------
+# Install dbus-fast (dependency of bleak)
+# ----------------------
+echo ""
+echo "== Installing dbus-fast (for bleak) =="
 
-pip3 install pytz
-pip3 install bleak>=1.0
-pip3 install gshock-api>=2.0.6
-pip3 install --break-system-packages luma.oled
+cd /tmp
+DBUS_FAST_WHL=$(find . -name "dbus_fast*.whl" | head -n 1)
+
+if [ -f "$DBUS_FAST_WHL" ]; then
+    echo "-> Installing prebuilt dbus-fast wheel: $DBUS_FAST_WHL"
+    pip3 install --break-system-packages "$DBUS_FAST_WHL"
+else
+    echo "-> No prebuilt dbus-fast wheel found. Installing from source (this may take several minutes)..."
+    pip3 install --break-system-packages dbus-fast
+fi
+
+# ----------------------
+# Install bleak
+# ----------------------
+echo ""
+echo "== Installing bleak =="
+pip3 install --break-system-packages bleak
+
+
+# ----------------------
+# Install Pillow & luma.oled
+# ----------------------
+echo ""
+echo "== Installing luma.oled and dependencies =="
+
+# Install system packages to avoid compiling Pillow
+sudo apt install -y python3-pil libjpeg-dev zlib1g-dev
+
+cd /tmp
+LUMA_WHL=$(find . -name "luma.oled*.whl" | head -n 1)
+
+if [ -f "$LUMA_WHL" ]; then
+    echo "-> Installing prebuilt luma.oled wheel: $LUMA_WHL"
+    pip3 install --break-system-packages "$LUMA_WHL"
+else
+    echo "-> No prebuilt luma.oled wheel found. Installing via pip (should be fast since Pillow is preinstalled)..."
+    pip3 install --break-system-packages luma.oled
+fi
+
+echo ""
+echo "✅ Installation complete!"
+
 
 # Create and enable systemd service
 cat << EOL | sudo tee /etc/systemd/system/gshock.service > /dev/null
