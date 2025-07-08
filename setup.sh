@@ -57,6 +57,5 @@ EOL
 sudo systemctl daemon-reload
 sudo systemctl enable gshock.service
 sudo systemctl start gshock.service
-# sudo systemctl status gshock.service
 
 echo "✅ gshock.service installed and started."

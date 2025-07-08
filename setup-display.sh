@@ -19,13 +19,4 @@ source venv/bin/activate
 pip install --upgrade pip
 pip install spidev smbus smbus2 gpiozero numpy luma.oled lgpio pillow
 
-# Download and extract OLED code
-wget https://files.waveshare.com/upload/5/53/1.3inch-OLED-HAT-Code.7z
-7zr x 1.3inch-OLED-HAT-Code.7z -r -o.
-sudo chmod 777 -R 1.3inch-OLED-HAT-Code
-
-# Run the OLED script using the venv python via sudo
-cd 1.3inch-OLED-HAT-Code/RaspberryPi/python
-python main.py
-
 echo "✅ Display setup complete!"
