@@ -10,7 +10,9 @@ sudo apt install -y python3-pip python3-venv zip unzip \
     python3-tk p7zip-full wget
 
 # Setup virtual environment
-python3 -m venv venv
+if [ ! -d "venv" ]; then
+  python3 -m venv venv
+fi
 source venv/bin/activate
 
 # Install Python packages
