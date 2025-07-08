@@ -21,7 +21,7 @@ elif command -v pacman >/dev/null 2>&1; then
     sudo pacman -Sy --noconfirm python-pip python-virtualenv zip unzip
 fi
 
-# Setup virtual environment
+# Setup virtual environmentjour     
 cd "$INSTALL_DIR"
 if [ ! -d "venv" ]; then
   python3 -m venv venv

@@ -39,4 +39,3 @@ else
     echo "No changes made. No reboot needed."
 fi
 echo "== SPI setup complete! =="
-echo "You can now run your display setup script."
