@@ -4,6 +4,7 @@ set -e
 
 INSTALL_DIR="$(cd "$(dirname "$0")"; pwd)"
 SERVICE_USER="$(whoami)"
+VENV_DIR="\$HOME/gshock-venv"
 
 echo "== G-Shock Server Installer for Linux =="
 
@@ -21,34 +22,33 @@ elif command -v pacman >/dev/null 2>&1; then
     sudo pacman -Sy --noconfirm python-pip python-virtualenv zip unzip
 fi
 
-# Setup virtual environmentjour     
-cd "$INSTALL_DIR"
-if [ ! -d "venv" ]; then
-  python3 -m venv venv
+# Setup virtual environment in home directory
+if [ ! -d "\$VENV_DIR" ]; then
+  python3 -m venv "\$VENV_DIR"
 fi
-source venv/bin/activate
+source "\$VENV_DIR/bin/activate"
 
 # Install dependencies
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install -r "\$INSTALL_DIR/requirements.txt"
 
 echo ""
 echo "✅ Installation complete!"
 
 # Create and enable systemd service
 SERVICE_FILE="/etc/systemd/system/gshock.service"
-sudo tee "$SERVICE_FILE" > /dev/null <<EOL
+sudo tee "\$SERVICE_FILE" > /dev/null <<EOL
 [Unit]
 Description=G-Shock Time Server
 After=network.target
 
 [Service]
-ExecStart=$INSTALL_DIR/venv/bin/python $INSTALL_DIR/gshock_server.py --multi-watch
-WorkingDirectory=$INSTALL_DIR
+ExecStart=\$VENV_DIR/bin/python \$INSTALL_DIR/gshock_server.py --multi-watch
+WorkingDirectory=\$INSTALL_DIR
 Environment=PYTHONUNBUFFERED=1
 Restart=on-failure
 RestartSec=5
-User=$SERVICE_USER
+User=\$SERVICE_USER
 
 [Install]
 WantedBy=multi-user.target
