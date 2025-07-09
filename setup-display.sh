@@ -17,6 +17,6 @@ source venv/bin/activate
 
 # Install Python packages
 pip install --upgrade pip
-pip install spidev smbus smbus2 gpiozero numpy luma.oled lgpio pillow
+pip install spidev smbus smbus2 gpiozero numpy luma.oled luma.lcd lgpio pillow
 
 echo "✅ Display setup complete!"

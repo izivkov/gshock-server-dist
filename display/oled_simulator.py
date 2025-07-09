@@ -93,6 +93,34 @@ def draw_oled_status(draw, image, width, height, font_large, font_small,
     icon_draw.line([center, center, center + 5, center], fill=0, width=2)
     image.paste(watch_icon, (watch_x, watch_y))
     
+class OLEDDisplay:
+    def __init__(self, width=128, height=64, i2c_port=1, i2c_address=0x3C):
+        self.width = width
+        self.height = height
+        serial = i2c(port=i2c_port, address=i2c_address)
+        self.device = ssd1306(serial, width=self.width, height=self.height)
+        self.font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 18)
+        self.font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 12)
+
+    def show_status(self, watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync):
+        MARGIN = 8  # margin in pixels around all edges
+        BOX_PADDING = 8  # extra padding inside the battery/temperature box
+
+        # Create a new image for each update.
+        image = Image.new("1", (self.width, self.height), color=0)
+        draw = ImageDraw.Draw(image)
+
+        # Use the shared drawing function
+        draw_oled_status(
+            draw, image, self.width, self.height,
+            self.font_large, self.font_small,
+            watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync,
+            margin=MARGIN, box_padding=BOX_PADDING
+        )
+
+        # Display on the real OLED
+        self.device.display(image)
+
 class MockOLEDDisplay:
     def __init__(self, width=240, height=240, output_file="oled_preview.png"):
         self.width = width
@@ -123,31 +151,3 @@ class MockOLEDDisplay:
         # Save image
         self.image.save(self.output_file)
         print(f"🖼 OLED preview saved as '{self.output_file}'.")
-
-class OLEDDisplay:
-    def __init__(self, width=128, height=64, i2c_port=1, i2c_address=0x3C):
-        self.width = width
-        self.height = height
-        serial = i2c(port=i2c_port, address=i2c_address)
-        self.device = ssd1306(serial, width=self.width, height=self.height)
-        self.font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 18)
-        self.font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 12)
-
-    def show_status(self, watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync):
-        MARGIN = 8  # margin in pixels around all edges
-        BOX_PADDING = 8  # extra padding inside the battery/temperature box
-
-        # Create a new image for each update
-        image = Image.new("1", (self.width, self.height), color=0)
-        draw = ImageDraw.Draw(image)
-
-        # Use the shared drawing function
-        draw_oled_status(
-            draw, image, self.width, self.height,
-            self.font_large, self.font_small,
-            watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync,
-            margin=MARGIN, box_padding=BOX_PADDING
-        )
-
-        # Display on the real OLED
-        self.device.display(image)
