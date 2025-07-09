@@ -78,10 +78,9 @@ def get_next_alarm_time(alarms):
     return next_alarm.hour, next_alarm.minute
 
 async def show_display(api: GshockAPI):
-    from display.oled_simulator import MockOLEDDisplay
+    from display.oled_simulator import OLEDDisplay
 
-    oled = MockOLEDDisplay()
-
+    oled = OLEDDisplay()
     try:
         alarms = await api.get_alarms()
         hour, minute = get_next_alarm_time(alarms)

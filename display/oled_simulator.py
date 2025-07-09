@@ -122,9 +122,9 @@ class MockOLEDDisplay:
 
         # Save image
         self.image.save(self.output_file)
-        print(f"🖼 OLED preview saved as '{self.output_file}'")
+        print(f"🖼 OLED preview saved as '{self.output_file}'.")
 
-class RealOLEDDisplay:
+class OLEDDisplay:
     def __init__(self, width=128, height=64, i2c_port=1, i2c_address=0x3C):
         self.width = width
         self.height = height
