@@ -17,6 +17,7 @@ def generate_battery_icon(percent: int, width=20, height=10) -> Image.Image:
         draw.rectangle([1, 1, 1 + fill_width - 1, height - 2], fill=1)
     return icon
 
+# Common function to draw OLED status
 def draw_oled_status(draw, image, width, height, font_large, font_small,
                      watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync,
                      margin=8, box_padding=8):
