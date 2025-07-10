@@ -11,6 +11,6 @@ sudo apt install -y python3-pip python3-venv zip unzip \
 
 # Install Python packages
 pip install --upgrade pip
-pip install spidev smbus smbus2 gpiozero numpy luma.oled luma.lcd lgpio pillow
+pip install spidev smbus smbus2 gpiozero numpy luma.oled luma.lcd lgpio pillow st7789
 
 echo "✅ Display setup complete!"
