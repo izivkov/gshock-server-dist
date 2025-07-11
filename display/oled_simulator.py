@@ -11,7 +11,7 @@ def generate_battery_icon(percent: int, width=20, height=10) -> Image.Image:
     The full part is white, the empty part is black."""
     icon = Image.new("RGB", (width + 3, height), color=(0, 0, 0))  # Black background
     draw = ImageDraw.Draw(icon)
-    # Battery outline
+    # Battery outline.
     draw.rectangle([0, 0, width - 1, height - 1], outline=(255, 255, 255), fill=None)
     # Battery terminal
     terminal_width = 3
@@ -26,40 +26,60 @@ def generate_battery_icon(percent: int, width=20, height=10) -> Image.Image:
         draw.rectangle([1 + fill_width, 1, width - 2, height - 2], fill=(0, 0, 0))
     return icon
 
-import random
-import time
+from PIL import Image, ImageDraw, ImageFont
 
-def show_waiting_message(self, duration=None):
+def show_waiting_message(self, message):
     """
-    Display 'Waiting for connection...' at a random position every 3 seconds.
-    If duration is None, run forever.
+    Display a multi-line message at the bottom of the screen over a background image.
+    Each line is horizontally centered.
     """
-    start_time = time.time()
-    message = "Waiting for connection..."
     font = self.font_large if hasattr(self, 'font_large') else ImageFont.load_default()
-    while duration is None or time.time() - start_time < duration:
+    margin = 5  # Bottom margin in pixels
+    line_spacing = 2  # Pixels between lines
+
+    # Load background image
+    try:
+        image = Image.open("pic/gw_b5600.png").convert("RGB")
+    except FileNotFoundError:
+        print("❌ Background image 'pic/gw_b5600.png' not found. Using black fallback.")
         image = Image.new("RGB", (self.width, self.height), "BLACK")
-        draw = ImageDraw.Draw(image)
-        # Get text size
-        bbox = draw.textbbox((0, 0), message, font=font)
-        text_w = bbox[2] - bbox[0]
-        text_h = bbox[3] - bbox[1]
-        # Pick a random position within bounds
-        max_x = max(0, self.width - text_w)
-        max_y = max(0, self.height - text_h)
-        x = random.randint(0, max_x)
-        y = random.randint(0, max_y)
-        draw.text((x, y), message, font=font, fill=(255, 255, 255))
-        # Display on the device
-        if hasattr(self, "disp") and hasattr(self.disp, "ShowImage"):
-            self.disp.ShowImage(image)
-        elif hasattr(self, "device") and hasattr(self.device, "display"):
-            self.device.display(image)
-        elif hasattr(self, "output_file"):
-            image.save(self.output_file)
-            print(f"🖼 OLED preview saved as '{self.output_file}'.")
-        time.sleep(5)
-                
+
+    draw = ImageDraw.Draw(image)
+
+    # Split message into lines
+    lines = message.strip().split('\n')
+
+    # Measure each line
+    line_sizes = [draw.textbbox((0, 0), line, font=font) for line in lines]
+    line_widths = [bbox[2] - bbox[0] for bbox in line_sizes]
+    line_heights = [bbox[3] - bbox[1] for bbox in line_sizes]
+
+    total_text_height = sum(line_heights) + line_spacing * (len(lines) - 1)
+
+    # Start Y position from bottom, adjusted by margin
+    start_y = self.height - total_text_height - margin
+
+    # Draw each line centered
+    y = start_y
+    for i, line in enumerate(lines):
+        text_w = line_widths[i]
+        text_h = line_heights[i]
+        x = (self.width - text_w) // 2
+        draw.text((x, y), line, font=font, fill=(255, 255, 255))
+        y += text_h + line_spacing
+
+    # Display the image
+    if hasattr(self, "disp") and hasattr(self.disp, "ShowImage"):
+        self.disp.ShowImage(image)
+    elif hasattr(self, "device") and hasattr(self.device, "display"):
+        self.device.display(image)
+    elif hasattr(self, "output_file"):
+        image.save(self.output_file)
+        print(f"🖼 OLED preview saved as '{self.output_file}'.")
+
+    # Save for future overlay (e.g., blinking status)
+    self.last_image = image.copy()
+
 # Common function to draw OLED status
 def draw_oled_status(draw, image, width, height, font_large, font_small,
                      watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync,
@@ -185,8 +205,12 @@ class MockOLEDDisplay:
         self.image.save(self.output_file)
         print(f"🖼 OLED preview saved as '{self.output_file}'.")
 
-        def show_waiting(self, duration=30):
-            show_waiting_message(self, duration)
+    def show_waiting(self, message):
+        show_waiting_message(self, message)
+
+    async def display_status_blinker(self):
+        await display_status_blinker(self)
+
 
 from display.lib import LCD_1inch3
 import time
@@ -217,6 +241,9 @@ class WaveshareDisplay:
             margin=MARGIN, box_padding=BOX_PADDING
         )
         self.disp.ShowImage(image)
+ 
+    def show_waiting(self, message):
+        show_waiting_message(self, message)
 
-    def show_waiting(self, duration=30):
-        show_waiting_message(self, duration)
+    async def display_status_blinker(self):
+        await display_status_blinker(self)

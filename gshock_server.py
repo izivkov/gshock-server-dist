@@ -101,8 +101,6 @@ async def show_display(api: GshockAPI):
     except Exception as e:
         logger.error(f"Got error: {e}")
 
-import asyncio
-
 async def run_time_server():
     prompt()
 
@@ -114,14 +112,12 @@ async def run_time_server():
                 address = conf.get("device.address")
 
             logger.info(f"Waiting for Connection...")
-            # Start waiting message in a background thread
-            waiting_task = asyncio.create_task(oled.show_waiting())            
+            oled.show_waiting("Waiting\nfor connection...") 
             
             connection = Connection(address)
             await connection.connect()
-
-            waiting_task.cancel()
-
+            oled.show_waiting("Connected!") 
+ 
             api = GshockAPI(connection)
             pressed_button = await api.get_pressed_button()
             if (
