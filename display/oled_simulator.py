@@ -29,15 +29,15 @@ def generate_battery_icon(percent: int, width=20, height=10) -> Image.Image:
 import random
 import time
 
-def show_waiting_message(self, duration=30):
+def show_waiting_message(self, duration=None):
     """
     Display 'Waiting for connection...' at a random position every 3 seconds.
-    duration: total time to show the message (in seconds)
+    If duration is None, run forever.
     """
     start_time = time.time()
     message = "Waiting for connection..."
     font = self.font_large if hasattr(self, 'font_large') else ImageFont.load_default()
-    while time.time() - start_time < duration:
+    while duration is None or time.time() - start_time < duration:
         image = Image.new("RGB", (self.width, self.height), "BLACK")
         draw = ImageDraw.Draw(image)
         # Get text size
@@ -59,7 +59,7 @@ def show_waiting_message(self, duration=30):
             image.save(self.output_file)
             print(f"🖼 OLED preview saved as '{self.output_file}'.")
         time.sleep(5)
-        
+                
 # Common function to draw OLED status
 def draw_oled_status(draw, image, width, height, font_large, font_small,
                      watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync,
