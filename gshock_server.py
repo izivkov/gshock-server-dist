@@ -88,7 +88,7 @@ async def show_display(api: GshockAPI):
         name = watch_info.name
         short_name = ' '.join(name.strip().split()[1:])
 
-        oled.show_status(
+        oled.show_status( 
             watch_name=short_name,
             battery = battery,
             temperature = temperature,
@@ -101,7 +101,7 @@ async def show_display(api: GshockAPI):
     except Exception as e:
         logger.error(f"Got error: {e}")
 
-import threading
+import asyncio
 
 async def run_time_server():
     prompt()
@@ -115,11 +115,12 @@ async def run_time_server():
 
             logger.info(f"Waiting for Connection...")
             # Start waiting message in a background thread
-            waiting_thread = threading.Thread(target=oled.show_waiting, args=(), daemon=True)
-            waiting_thread.start()
+            waiting_task = asyncio.create_task(oled.show_waiting())            
             
             connection = Connection(address)
             await connection.connect()
+
+            waiting_task.cancel()
 
             api = GshockAPI(connection)
             pressed_button = await api.get_pressed_button()
