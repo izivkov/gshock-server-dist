@@ -26,10 +26,44 @@ def generate_battery_icon(percent: int, width=20, height=10) -> Image.Image:
         draw.rectangle([1 + fill_width, 1, width - 2, height - 2], fill=(0, 0, 0))
     return icon
 
+import random
+import time
+
+def show_waiting_message(self, duration=30):
+    """
+    Display 'Waiting for connection...' at a random position every 3 seconds.
+    duration: total time to show the message (in seconds)
+    """
+    start_time = time.time()
+    message = "Waiting for connection..."
+    font = self.font_large if hasattr(self, 'font_large') else ImageFont.load_default()
+    while time.time() - start_time < duration:
+        image = Image.new("RGB", (self.width, self.height), "BLACK")
+        draw = ImageDraw.Draw(image)
+        # Get text size
+        bbox = draw.textbbox((0, 0), message, font=font)
+        text_w = bbox[2] - bbox[0]
+        text_h = bbox[3] - bbox[1]
+        # Pick a random position within bounds
+        max_x = max(0, self.width - text_w)
+        max_y = max(0, self.height - text_h)
+        x = random.randint(0, max_x)
+        y = random.randint(0, max_y)
+        draw.text((x, y), message, font=font, fill=(255, 255, 255))
+        # Display on the device
+        if hasattr(self, "disp") and hasattr(self.disp, "ShowImage"):
+            self.disp.ShowImage(image)
+        elif hasattr(self, "device") and hasattr(self.device, "display"):
+            self.device.display(image)
+        elif hasattr(self, "output_file"):
+            image.save(self.output_file)
+            print(f"🖼 OLED preview saved as '{self.output_file}'.")
+        time.sleep(5)
+        
 # Common function to draw OLED status
 def draw_oled_status(draw, image, width, height, font_large, font_small,
                      watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync,
-                     margin=8, box_padding=8):
+                     margin=8, box_padding=8): 
     
     # Header (centered horizontally, margin from top)
     bbox = draw.textbbox((0, 0), watch_name, font=font_large)
@@ -151,38 +185,30 @@ class MockOLEDDisplay:
         self.image.save(self.output_file)
         print(f"🖼 OLED preview saved as '{self.output_file}'.")
 
-import RPi.GPIO as GPIO
-from .oled_simulator import draw_oled_status
+        def show_waiting(self, duration=30):
+            show_waiting_message(self, duration)
 
-import ST7789  # This is the Waveshare library for 1.3" LCD
-import RPi.GPIO as GPIO
-from .oled_simulator import draw_oled_status
+from display.lib import LCD_1inch3
+import time
 
-class LCD1Inch3Display:
+class WaveshareDisplay:
     def __init__(self, width=240, height=240, dc=24, rst=25, bl=18, spi_speed_hz=40000000):
         self.width = width
         self.height = height
-        self.lcd = ST7789.ST7789(
-            height=self.height,
-            width=self.width,
-            rotation=180,
-            port=0,
-            cs=0,
-            dc=dc,
-            rst=rst,
-            spi_speed_hz=spi_speed_hz,
-            offset_left=0,
-            offset_top=0,
-            backlight=bl
-        )
-        self.lcd.begin()
+
         self.font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 20)
         self.font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 16)
 
+        self.disp = LCD_1inch3.LCD_1inch3()
+        self.disp.Init()
+        self.disp.clear() 
+        self.disp.bl_DutyCycle(10)
+
     def show_status(self, watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync):
+
         MARGIN = 8
         BOX_PADDING = 8
-        image = Image.new("RGB", (self.width, self.height), color=0)
+        image = Image.new("RGB", (self.width, self.height), "BLACK")
         draw = ImageDraw.Draw(image)
         draw_oled_status(
             draw, image, self.width, self.height,
@@ -190,5 +216,7 @@ class LCD1Inch3Display:
             watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync,
             margin=MARGIN, box_padding=BOX_PADDING
         )
-        # The Waveshare library expects a PIL image
-        self.lcd.display(image)
+        self.disp.ShowImage(image)
+
+    def show_waiting(self, duration=30):
+        show_waiting_message(self, duration)

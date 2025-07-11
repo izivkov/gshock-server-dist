@@ -39,7 +39,7 @@ try:
     draw.rectangle((5,10,6,11), fill = "BLACK")
     draw.rectangle((5,25,7,27), fill = "BLACK")
     draw.rectangle((5,40,8,43), fill = "BLACK")
-    draw.rectangle((5,55,9,59), fill = "BLACK")
+    draw.rectangle((5,55,9,59), fill = "BLACK") 
 
     logging.info("draw line")
     draw.line([(20, 10),(70, 60)], fill = "RED",width = 1)

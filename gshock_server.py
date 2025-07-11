@@ -67,11 +67,11 @@ def get_next_alarm_time(alarms):
 
     return next_alarm.hour, next_alarm.minute
 
-async def show_display(api: GshockAPI):
-    # from display.oled_simulator import OLEDDisplay
-    from display.oled_simulator import LCD1Inch3Display
+# Change this to a different display as needed.
+from display.oled_simulator import WaveshareDisplay
+oled = WaveshareDisplay() 
 
-    oled = LCD1Inch3Display() 
+async def show_display(api: GshockAPI):
     try:
         alarms = await api.get_alarms()
         hour, minute = get_next_alarm_time(alarms)
@@ -101,6 +101,8 @@ async def show_display(api: GshockAPI):
     except Exception as e:
         logger.error(f"Got error: {e}")
 
+import threading
+
 async def run_time_server():
     prompt()
 
@@ -112,6 +114,10 @@ async def run_time_server():
                 address = conf.get("device.address")
 
             logger.info(f"Waiting for Connection...")
+            # Start waiting message in a background thread
+            waiting_thread = threading.Thread(target=oled.show_waiting, args=(), daemon=True)
+            waiting_thread.start()
+            
             connection = Connection(address)
             await connection.connect()
 
