@@ -43,7 +43,7 @@ Description=G-Shock Time Server
 After=network.target
 
 [Service]
-ExecStart=$VENV_DIR/bin/python \$INSTALL_DIR/gshock_server.py --multi-watch
+ExecStart=$VENV_DIR/bin/python $INSTALL_DIR/gshock_server.py --multi-watch
 WorkingDirectory=$INSTALL_DIR
 Environment=PYTHONUNBUFFERED=1
 Restart=on-failure
