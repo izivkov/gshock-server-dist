@@ -39,7 +39,7 @@ def show_waiting_message(self, message):
 
     # Load background image
     try:
-        image = Image.open("display/pic/gw_b5600.png").convert("RGB")
+        image = Image.open("display/pic/gw_b5600.png").convert("RGB").resize((self.width, self.height))
     except FileNotFoundError:
         print("❌ Background image 'display/pic/gw_b5600.png' not found. Using black fallback.")
         image = Image.new("RGB", (self.width, self.height), "BLACK")
