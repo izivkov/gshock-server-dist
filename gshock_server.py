@@ -14,6 +14,7 @@ from gshock_api.watch_info import watch_info
 from args import args
 from datetime import datetime, timedelta
 from gshock_api.watch_info import watch_info
+from display.display import WaveshareDisplay
 
 __author__ = "Ivo Zivkov"
 __copyright__ = "Ivo Zivkov"
@@ -35,7 +36,6 @@ def prompt():
         "=============================================================================================="
     )
     logger.info("")
-
 
 def get_next_alarm_time(alarms):
     now = datetime.now()
@@ -68,7 +68,6 @@ def get_next_alarm_time(alarms):
     return next_alarm.hour, next_alarm.minute
 
 # Change this to a different display as needed.
-from display.oled_simulator import WaveshareDisplay
 oled = WaveshareDisplay() 
 
 async def show_display(api: GshockAPI):
@@ -112,11 +111,11 @@ async def run_time_server():
                 address = conf.get("device.address")
 
             logger.info(f"Waiting for Connection...")
-            oled.show_waiting("Waiting\nfor connection...") 
+            oled.show_welcome_screen(message="Waiting\nfor connection...", watch_name=watch_info.name, last_sync="7/21 12:00") 
             
             connection = Connection(address)
             await connection.connect()
-            oled.show_waiting("Connected!") 
+            oled.show_welcome_screen("Connected!")  
  
             api = GshockAPI(connection)
             pressed_button = await api.get_pressed_button()

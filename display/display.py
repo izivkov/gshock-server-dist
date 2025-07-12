@@ -1,10 +1,13 @@
+from email.mime import message
 from luma.core.interface.serial import spi
 from luma.lcd.device import st7789
 
 from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime
 
-import serial
+font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 16)
+font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 20)
+font_extra_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
 
 def generate_battery_icon(percent: int, width=20, height=10) -> Image.Image:
     """Generates a battery icon as a color image for preview.
@@ -28,38 +31,51 @@ def generate_battery_icon(percent: int, width=20, height=10) -> Image.Image:
 
 from PIL import Image, ImageDraw, ImageFont
 
-def show_waiting_message(self, message):
+def show_welcome_screen(self, message, watch_name=None, last_sync=None):
     """
     Display a multi-line message at the bottom of the screen over a background image.
-    Each line is horizontally centered.
+    If watch_name and last_sync are provided, they appear above the message.
+    All lines are horizontally centered.
     """
-    font = self.font_large if hasattr(self, 'font_large') else ImageFont.load_default()
+    # font = self.font_extra_large if hasattr(self, 'font_extra_large') else ImageFont.load_default()
+    font = font_small
     margin = 5  # Bottom margin in pixels
-    line_spacing = 2  # Pixels between lines
+    line_spacing = 4  # Pixels between lines
 
     # Load background image
     try:
-        image = Image.open("display/pic/dw_b5600.png").convert("RGB").resize((self.width, self.height))
+        img_path = "gshock-server/display/pic/gw-b5600.png" if hasattr(self, 'output_file') \
+            else "display/pic/gw-b5600.png"
+        image = Image.open(img_path).convert("RGB").resize((self.width, self.height))
     except FileNotFoundError:
-        print("❌ Background image 'display/pic/dw_b5600.png' not found. Using black fallback.")
+        print(f"❌ Background image '{img_path}' not found. Using black fallback.")
         image = Image.new("RGB", (self.width, self.height), "BLACK")
 
     draw = ImageDraw.Draw(image)
 
-    # Split message into lines
-    lines = message.strip().split('\n')
+    # Compose all lines to be displayed
+    lines = []
 
-    # Measure each line
+    if watch_name is not None:
+        lines.append(f"Watch: {watch_name}")
+    if last_sync is not None:
+        lines.append(f"Last sync: {last_sync}")
+    
+    # Split the main message into lines and add
+    message_lines = message.strip().split('\n')
+    lines.extend(message_lines)
+
+    # Measure each line's size
     line_sizes = [draw.textbbox((0, 0), line, font=font) for line in lines]
     line_widths = [bbox[2] - bbox[0] for bbox in line_sizes]
     line_heights = [bbox[3] - bbox[1] for bbox in line_sizes]
 
     total_text_height = sum(line_heights) + line_spacing * (len(lines) - 1)
 
-    # Start Y position from bottom, adjusted by margin
+    # Compute vertical starting point (bottom-aligned)
     start_y = self.height - total_text_height - margin
 
-    # Draw each line centered
+    # Draw all lines centered
     y = start_y
     for i, line in enumerate(lines):
         text_w = line_widths[i]
@@ -77,11 +93,11 @@ def show_waiting_message(self, message):
         image.save(self.output_file)
         print(f"🖼 OLED preview saved as '{self.output_file}'.")
 
-    # Save for future overlay (e.g., blinking status)
+    # Save for use in overlays (e.g., blinking dot)
     self.last_image = image.copy()
 
 # Common function to draw OLED status
-def draw_oled_status(draw, image, width, height, font_large, font_small,
+def draw_status(draw, image, width, height, font_large, font_small,
                      watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync,
                      margin=8, box_padding=8): 
     
@@ -143,17 +159,12 @@ def draw_oled_status(draw, image, width, height, font_large, font_small,
         draw.text((width - val_w - margin, y), str_value, font=font_small, fill=(255, 255, 255))
         y += bbox_val[3] - bbox_val[1] + margin
     
-class OLEDDisplay:
+class LumaDisplay:
     def __init__(self, width=240, height=240, i2c_port=1, i2c_address=0x3C):
         self.width = width
         self.height = height
-        # serial = i2c(port=i2c_port, address=i2c_address)
-        # self.device = ssd1306(serial, width=self.width, height=self.height)
         serial = spi(port=0, device=0, gpio_DC=24, gpio_RST=25)
         self.device = st7789(serial, width=240, height=240, rotate=0)
-
-        self.font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 20)
-        self.font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 16)
 
     def show_status(self, watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync):
         MARGIN = 8  # margin in pixels around all edges
@@ -164,9 +175,9 @@ class OLEDDisplay:
         draw = ImageDraw.Draw(image)
 
         # Use the shared drawing function
-        draw_oled_status(
+        draw_status(
             draw, image, self.width, self.height,
-            self.font_large, self.font_small,
+            font_large, font_small,
             watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync,
             margin=MARGIN, box_padding=BOX_PADDING
         )
@@ -174,17 +185,17 @@ class OLEDDisplay:
         # Display on the real OLED
         self.device.display(image)
 
-class MockOLEDDisplay:
+    def show_welcome_screen(self, message, watch_name=None, last_sync=None):
+        show_welcome_screen(self, message, watch_name, last_sync)
+
+
+class MockDisplay:
     def __init__(self, width=240, height=240, output_file="oled_preview.png"):
         self.width = width
         self.height = height
         self.output_file = output_file
         self.image = Image.new("RGB", (self.width, self.height), color=0)
         self.draw = ImageDraw.Draw(self.image)
-
-        # Load fonts
-        self.font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 18)
-        self.font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 12)
 
     def show_status(self, watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync):
         MARGIN = 8  # margin in pixels around all edges
@@ -194,9 +205,9 @@ class MockOLEDDisplay:
         self.draw.rectangle((0, 0, self.width, self.height), fill=0)
 
         # Use the shared drawing function
-        draw_oled_status(
+        draw_status(
             self.draw, self.image, self.width, self.height,
-            self.font_large, self.font_small,
+            font_large, font_small,
             watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync,
             margin=MARGIN, box_padding=BOX_PADDING
         )
@@ -205,23 +216,16 @@ class MockOLEDDisplay:
         self.image.save(self.output_file)
         print(f"🖼 OLED preview saved as '{self.output_file}'.")
 
-    def show_waiting(self, message):
-        show_waiting_message(self, message)
-
-    async def display_status_blinker(self):
-        await display_status_blinker(self)
+    def show_welcome_screen(self, message, watch_name=None, last_sync=None):
+        show_welcome_screen(self, message, watch_name, last_sync)
 
 
 from display.lib import LCD_1inch3
-import time
 
 class WaveshareDisplay:
     def __init__(self, width=240, height=240, dc=24, rst=25, bl=18, spi_speed_hz=40000000):
         self.width = width
         self.height = height
-
-        self.font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 20)
-        self.font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 16)
 
         self.disp = LCD_1inch3.LCD_1inch3()
         self.disp.Init()
@@ -234,16 +238,13 @@ class WaveshareDisplay:
         BOX_PADDING = 8
         image = Image.new("RGB", (self.width, self.height), "BLACK")
         draw = ImageDraw.Draw(image)
-        draw_oled_status(
+        draw_status(
             draw, image, self.width, self.height,
-            self.font_large, self.font_small,
+            font_large, font_small,
             watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync,
             margin=MARGIN, box_padding=BOX_PADDING
         )
         self.disp.ShowImage(image)
  
-    def show_waiting(self, message):
-        show_waiting_message(self, message)
-
-    async def display_status_blinker(self):
-        await display_status_blinker(self)
+    def show_welcome_screen(self, message, watch_name=None, last_sync=None):
+        show_welcome_screen(self, message, watch_name, last_sync)
