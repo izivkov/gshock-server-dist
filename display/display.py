@@ -44,8 +44,8 @@ def show_welcome_screen(self, message, watch_name=None, last_sync=None):
 
     # Load background image
     try:
-        img_path = "gshock-server/display/pic/gw-b5600.png" if hasattr(self, 'output_file') \
-            else "display/pic/gw-b5600.png"
+        img_path = "gshock-server/display/pic/dw-b5600.png" if hasattr(self, 'output_file') \
+            else "display/pic/dw-b5600.png"
         image = Image.open(img_path).convert("RGB").resize((self.width, self.height))
     except FileNotFoundError:
         print(f"❌ Background image '{img_path}' not found. Using black fallback.")
@@ -159,43 +159,10 @@ def draw_status(draw, image, width, height, font_large, font_small,
         draw.text((width - val_w - margin, y), str_value, font=font_small, fill=(255, 255, 255))
         y += bbox_val[3] - bbox_val[1] + margin
     
-class LumaDisplay:
-    def __init__(self, width=240, height=240, i2c_port=1, i2c_address=0x3C):
-        self.width = width
-        self.height = height
-        serial = spi(port=0, device=0, gpio_DC=24, gpio_RST=25)
-        self.device = st7789(serial, width=240, height=240, rotate=0)
-
-    def show_status(self, watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync):
-        MARGIN = 8  # margin in pixels around all edges
-        BOX_PADDING = 8  # extra padding inside the battery/temperature box
-
-        # Create a new image for each update.
-        image = Image.new("RGB", (self.width, self.height), color=0)
-        draw = ImageDraw.Draw(image)
-
-        # Use the shared drawing function
-        draw_status(
-            draw, image, self.width, self.height,
-            font_large, font_small,
-            watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync,
-            margin=MARGIN, box_padding=BOX_PADDING
-        )
-
-        # Display on the real OLED
-        self.device.display(image)
-
-    def show_welcome_screen(self, message, watch_name=None, last_sync=None):
-        show_welcome_screen(self, message, watch_name, last_sync)
-
-
-class MockDisplay:
+class Display:
     def __init__(self, width=240, height=240, output_file="oled_preview.png"):
-        self.width = width
-        self.height = height
-        self.output_file = output_file
-        self.image = Image.new("RGB", (self.width, self.height), color=0)
-        self.draw = ImageDraw.Draw(self.image)
+        # override in subclasses
+        pass
 
     def show_status(self, watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync):
         MARGIN = 8  # margin in pixels around all edges
@@ -212,39 +179,7 @@ class MockDisplay:
             margin=MARGIN, box_padding=BOX_PADDING
         )
 
-        # Save image
-        self.image.save(self.output_file)
-        print(f"🖼 OLED preview saved as '{self.output_file}'.")
+        return self.image
 
-    def show_welcome_screen(self, message, watch_name=None, last_sync=None):
-        show_welcome_screen(self, message, watch_name, last_sync)
-
-
-from display.lib import LCD_1inch3
-
-class WaveshareDisplay:
-    def __init__(self, width=240, height=240, dc=24, rst=25, bl=18, spi_speed_hz=40000000):
-        self.width = width
-        self.height = height
-
-        self.disp = LCD_1inch3.LCD_1inch3()
-        self.disp.Init()
-        self.disp.clear() 
-        self.disp.bl_DutyCycle(10)
-
-    def show_status(self, watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync):
-
-        MARGIN = 8
-        BOX_PADDING = 8
-        image = Image.new("RGB", (self.width, self.height), "BLACK")
-        draw = ImageDraw.Draw(image)
-        draw_status(
-            draw, image, self.width, self.height,
-            font_large, font_small,
-            watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync,
-            margin=MARGIN, box_padding=BOX_PADDING
-        )
-        self.disp.ShowImage(image)
- 
     def show_welcome_screen(self, message, watch_name=None, last_sync=None):
         show_welcome_screen(self, message, watch_name, last_sync)
