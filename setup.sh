@@ -36,26 +36,26 @@ echo ""
 echo "✅ Installation complete!"
 
 # Create and enable systemd service
-# SERVICE_FILE="/etc/systemd/system/gshock.service"
-# sudo tee "$SERVICE_FILE" > /dev/null <<EOL
-# [Unit]
-# Description=G-Shock Time Server
-# After=network.target
+SERVICE_FILE="/etc/systemd/system/gshock.service"
+sudo tee "$SERVICE_FILE" > /dev/null <<EOL
+[Unit]
+Description=G-Shock Time Server
+After=network.target
 
-# [Service]
-# ExecStart=$VENV_DIR/bin/python $INSTALL_DIR/gshock_server.py --multi-watch
-# WorkingDirectory=$INSTALL_DIR
-# Environment=PYTHONUNBUFFERED=1
-# Restart=on-failure
-# RestartSec=5
-# User=$SERVICE_USER
+[Service]
+ExecStart=$VENV_DIR/bin/python $INSTALL_DIR/gshock_server.py --multi-watch
+WorkingDirectory=$INSTALL_DIR
+Environment=PYTHONUNBUFFERED=1
+Restart=on-failure
+RestartSec=5
+User=$SERVICE_USER
 
-# [Install]
-# WantedBy=multi-user.target
-# EOL
+[Install]
+WantedBy=multi-user.target
+EOL
 
-# sudo systemctl daemon-reload
-# sudo systemctl enable gshock.service
-# sudo systemctl start gshock.service
+sudo systemctl daemon-reload
+sudo systemctl enable gshock.service
+sudo systemctl start gshock.service
 
 echo "✅ gshock.service installed and started."
