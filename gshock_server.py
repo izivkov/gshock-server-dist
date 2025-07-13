@@ -14,8 +14,8 @@ from gshock_api.watch_info import watch_info
 from args import args
 from datetime import datetime, timedelta
 from gshock_api.watch_info import watch_info
-# from display.waveshare_display import WaveshareDisplay
-from display.mock_display import MockDisplay
+from display.waveshare_display import WaveshareDisplay
+# from display.mock_display import MockDisplay
 
 __author__ = "Ivo Zivkov"
 __copyright__ = "Ivo Zivkov"
@@ -69,7 +69,7 @@ def get_next_alarm_time(alarms):
     return next_alarm.hour, next_alarm.minute
 
 # Change this to a different display as needed.
-oled = MockDisplay() 
+oled = WaveshareDisplay() 
 
 async def show_display(api: GshockAPI):
     try:
