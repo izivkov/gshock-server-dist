@@ -165,7 +165,7 @@ class Display:
         MARGIN = 8  # margin in pixels around all edges
 
         # Clear screen
-        self.draw.rectangle((0, 0, self.width, self.height), fill=0)
+        # self.draw.rectangle((0, 0, self.width, self.height), fill=0)
 
         # Use the shared drawing function
         draw_status(
