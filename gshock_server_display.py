@@ -146,10 +146,16 @@ async def run_time_server():
             logger.info(f"Time set at {datetime.now()} on {watch_info.name}")
 
             # Only update the display of we have pressed LOWER-LEFT button,
-            # Otherwise the watch will dicoinnect before we get all the information for the display.
+            # Otherwise the watch will disconnect before we get all the information for the display.
             if pressed_button == WatchButton.LOWER_LEFT:
                 await show_display(api)
-
+            elif pressed_button == WatchButton.LOWER_RIGHT:
+                oled.show_welcome_screen(
+                    message="Waiting\nfor connection...",
+                    watch_name=watch_name,
+                    last_sync=last_sync
+                )
+    
             if watch_info.alwaysConnected == False:
                 await connection.disconnect()
 
