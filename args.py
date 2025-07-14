@@ -1,7 +1,6 @@
 import argparse
 import sys
 
-
 class Args:
     def __init__(self):
         self.parse_and_store(sys.argv[1:])
@@ -12,7 +11,6 @@ class Args:
             "--multi-watch",
             action='store_true',
             help="--multi-watch allows use of multimple watches")
-
         parser.add_argument(
             "--fine-adjustment-secs",
             type=int,
@@ -23,10 +21,17 @@ class Args:
         parser.add_argument(
             "-l", "--log_level", default="INFO", help="Sets log level", required=False
         )
+        parser.add_argument(
+            "--display",
+            type=str,
+            choices=["mock", "waveshare", "ftp154"],
+            default="mock",
+            help="Select display type: mock, waveshare, or ftp154"
+        )
+
         self.args = parser.parse_args(args)
 
     def get(self):
         return self.args
-
 
 args = Args()

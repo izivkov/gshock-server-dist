@@ -11,13 +11,9 @@ from gshock_api.scanner import scanner
 from gshock_api.configurator import conf
 from gshock_api.logger import logger
 from gshock_api.watch_info import watch_info
-from args import args
+from args import Args, args
 from datetime import datetime, timedelta
 from gshock_api.watch_info import watch_info
-
-# from display.mock_display import MockDisplay
-from display.waveshare_display import WaveshareDisplay
-# from display.ftp154_display import FTP154Display
 
 __author__ = "Ivo Zivkov"
 __copyright__ = "Ivo Zivkov"
@@ -39,6 +35,21 @@ def prompt():
         "=============================================================================================="
     )
     logger.info("")
+
+def get_display(display_type: str):
+    if display_type == "mock":
+        from display.mock_display import MockDisplay
+        return MockDisplay()
+    elif display_type == "waveshare":
+        from display.waveshare_display import WaveshareDisplay
+        return WaveshareDisplay()
+    elif display_type == "ftp154":
+        from display.ftp154_display import FTP154Display
+        return FTP154Display()
+    else:
+        raise ValueError(f"Unsupported display type: {display_type}")
+
+oled = get_display(args.display)
 
 def get_next_alarm_time(alarms):
     now = datetime.now()
@@ -69,9 +80,6 @@ def get_next_alarm_time(alarms):
         return None, None
 
     return next_alarm.hour, next_alarm.minute
-
-# Change this to a different display as needed.
-oled = WaveshareDisplay()  # Default to MockDisplay for testing
 
 async def show_display(api: GshockAPI):
     try:
