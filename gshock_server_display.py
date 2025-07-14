@@ -150,10 +150,17 @@ async def run_time_server():
 
             # Apply fine adjustment to the time
             fine_adjustment_secs = args.fine_adjustment_secs
-            await api.set_time(int(time.time()) + fine_adjustment_secs)
-    
-            logger.info(f"Time set at {datetime.now()} on {watch_info.name}")
 
+            try:
+                await api.set_time(int(time.time()) + fine_adjustment_secs)
+                logger.info(f"Time set at {datetime.now()} on {watch_info.name}")
+            except Exception as e:
+                # Ignore this exception. If the LOWER-RIGHT button is pressed, 
+                # the connection will be closed before the call completes with a respnse. The call actually works, though.
+                if pressed_button == WatchButton.LOWER_LEFT:
+                    raise e
+                logger.error(f"Tume set")
+    
             # Only update the display of we have pressed LOWER-LEFT button,
             # Otherwise the watch will disconnect before we get all the information for the display.
             if pressed_button == WatchButton.LOWER_LEFT:
