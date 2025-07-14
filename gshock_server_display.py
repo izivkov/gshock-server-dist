@@ -161,7 +161,7 @@ async def run_time_server():
             elif pressed_button == WatchButton.LOWER_RIGHT:
                 oled.show_welcome_screen(
                     message="Waiting\nfor connection...",
-                    watch_name=watch_name,
+                    watch_name=store.get("watch_name", "Unknown"),
                     last_sync=last_sync
                 )
     
