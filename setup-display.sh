@@ -13,6 +13,13 @@ sudo apt install -y python3-pip python3-venv zip unzip \
 pip install --upgrade pip
 pip install spidev smbus smbus2 gpiozero numpy luma.oled luma.lcd lgpio pillow st7789
 
+# Prompt user for display type
+read -p "Which display are you using? [waveshare/ftp154] (default: waveshare): " DISPLAY_TYPE
+
+if [[ "$DISPLAY_TYPE" != "ftp154" ]]; then
+  DISPLAY_TYPE="waveshare"
+fi
+
 # Overwrite systemd service with display version
 SERVICE_FILE="/etc/systemd/system/gshock.service"
 sudo tee "$SERVICE_FILE" > /dev/null <<EOL
@@ -21,7 +28,7 @@ Description=G-Shock Time Server
 After=network.target
 
 [Service]
-ExecStart=$VENV_DIR/bin/python $INSTALL_DIR/gshock_server_display.py --multi-watch
+ExecStart=$VENV_DIR/bin/python $INSTALL_DIR/gshock_server_display.py --multi-watch --display $DISPLAY_TYPE
 WorkingDirectory=$INSTALL_DIR
 Environment=PYTHONUNBUFFERED=1
 Restart=on-failure
