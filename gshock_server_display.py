@@ -50,10 +50,6 @@ def get_display(display_type: str):
         raise ValueError(f"Unsupported display type: {display_type}")
 
 
-print(type(args))          # Should be <class 'argparse.Namespace'>
-print(vars(args))          # Show parsed values
-print(args.display)  
-
 oled = get_display(args.display)
 
 def get_next_alarm_time(alarms):
