@@ -7,10 +7,12 @@ class Args:
 
     def parse_and_store(self, args):
         parser = argparse.ArgumentParser(description="Parser")
+        
         parser.add_argument(
             "--multi-watch",
             action='store_true',
             help="--multi-watch allows use of multimple watches")
+        
         parser.add_argument(
             "--fine-adjustment-secs",
             type=int,
@@ -18,9 +20,7 @@ class Args:
             default=0,
             help="Fine adjustment in seconds to add/subtract when setting time (-10 to 10)"
         )
-        parser.add_argument(
-            "-l", "--log_level", default="INFO", help="Sets log level", required=False
-        )
+        
         parser.add_argument(
             "--display",
             type=str,
@@ -29,9 +29,13 @@ class Args:
             help="Select display type: mock, waveshare, or ftp154"
         )
 
+        parser.add_argument(
+            "-l", "--log_level", default="INFO", help="Sets log level", required=False
+        )
+
         self.args = parser.parse_args(args)
 
     def get(self):
         return self.args
 
-args = Args()
+args = Args().get()

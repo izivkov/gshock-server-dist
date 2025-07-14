@@ -11,7 +11,7 @@ from gshock_api.scanner import scanner
 from gshock_api.configurator import conf
 from gshock_api.logger import logger
 from gshock_api.watch_info import watch_info
-from args import Args, args
+from args import args
 from datetime import datetime, timedelta
 from gshock_api.watch_info import watch_info
 
@@ -48,6 +48,11 @@ def get_display(display_type: str):
         return FTP154Display()
     else:
         raise ValueError(f"Unsupported display type: {display_type}")
+
+
+print(type(args))          # Should be <class 'argparse.Namespace'>
+print(vars(args))          # Show parsed values
+print(args.display)  
 
 oled = get_display(args.display)
 
@@ -120,7 +125,7 @@ async def run_time_server():
 
     while True:
         try:
-            if args.get().multi_watch:
+            if args.multi_watch:
                 address = None
             else:
                 address = conf.get("device.address")
@@ -148,7 +153,7 @@ async def run_time_server():
                 continue
 
             # Apply fine adjustment to the time
-            fine_adjustment_secs = args.get().fine_adjustment_secs
+            fine_adjustment_secs = args.fine_adjustment_secs
             await api.set_time(int(time.time()) + fine_adjustment_secs)
     
             logger.info(f"Time set at {datetime.now()} on {watch_info.name}")
