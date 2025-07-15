@@ -132,10 +132,14 @@ async def run_time_server():
             watch_name = store.get("watch_name", "Unknown")
             last_sync = store.get("last_connected", "Unknown")
 
-            logger.info("Waiting for Connection...")
+            if watch_name == "Unknown":
+                oled.show_welcome_screen(
+                    message="Waiting\nfor connection...",
+                    watch_name=watch_name,
+                    last_sync=last_sync
+                )
 
-            if watch_info is None or watch_info.name != watch_name:
-                oled.show_welcome_screen(message="Waiting\nfor connection...", watch_name=watch_name, last_sync=last_sync)
+            logger.info("Waiting for Connection...")
 
             connection = Connection(address)
             await connection.connect()
@@ -178,7 +182,6 @@ async def run_time_server():
 
             if watch_info.alwaysConnected is False:
                 await connection.disconnect()
-
             pass
 
 if __name__ == "__main__":
