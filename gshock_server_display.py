@@ -15,7 +15,7 @@ from args import args
 from datetime import datetime, timedelta
 from gshock_api.watch_info import watch_info
 from gshock_api.exceptions import GShockConnectionError
-
+from utils import run_once_key
 
 __author__ = "Ivo Zivkov"
 __copyright__ = "Ivo Zivkov"
@@ -133,12 +133,13 @@ async def run_time_server():
             watch_name = store.get("watch_name", "Unknown")
             last_sync = store.get("last_connected", "Unknown")
 
-            if watch_name == "Unknown" or first_run:
-                oled.show_welcome_screen(
-                    message="Waiting\nfor connection...",
-                    watch_name=watch_name,
-                    last_sync=last_sync
-                )
+            run_once_key(
+                "show_welcome_screen",
+                oled.show_welcome_screen,
+                message="Waiting\nfor connection...",
+                watch_name=watch_name,
+                last_sync=last_sync
+            )
 
             logger.info("Waiting for Connection...")
 
@@ -175,7 +176,7 @@ async def run_time_server():
             # Only show full display if LOWER_LEFT was pressed
             if pressed_button == WatchButton.LOWER_LEFT:
                 await show_display(api)
-            elif pressed_button == WatchButton.LOWER_RIGHT:
+            elif pressed_button == WatchButton.LOWER_RIGHT or pressed_button == WatchButton.NO_BUTTON:
                 oled.show_welcome_screen(
                     message="Waiting\nfor connection...",
                     watch_name=store.get("watch_name", "Unknown"),
