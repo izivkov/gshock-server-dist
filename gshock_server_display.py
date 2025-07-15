@@ -112,7 +112,7 @@ async def show_display(api: GshockAPI):
             auto_sync="On" if await api.get_time_adjustment() else "Off",
         )
 
-    except GShockConnectionError as e:
+    except Exception as e:
         logger.error(f"Got error: {e}")
 
 from peristent_store import PersistentMap
@@ -169,14 +169,14 @@ async def run_time_server():
 
             logger.info(f"Time set at {datetime.now()} on {watch_info.name}")
 
-        except Exception as e:
+        except GShockConnectionError as e:
             logger.error(f"Got error: {e}")
 
         finally:
             # Only show full display if LOWER_LEFT was pressed
             if pressed_button == WatchButton.LOWER_LEFT:
                 await show_display(api)
-            elif pressed_button == WatchButton.LOWER_RIGHT or pressed_button == WatchButton.NO_BUTTON:
+            else:
                 oled.show_welcome_screen(
                     message="Waiting\nfor connection...",
                     watch_name=store.get("watch_name", "Unknown"),
