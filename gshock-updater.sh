@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+DIST_DIR="gshock-server-dist"
 REPO_DIR="~/"
 REPO_URL="https://github.com/izivkov/gshock-server-dist.git"
 LAST_TAG_FILE="$HOME/last-tag"
