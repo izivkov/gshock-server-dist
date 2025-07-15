@@ -143,7 +143,7 @@ def draw_status(draw, image, width, height, font_large, font_small,
     info = [
         ("Last Sync:", last_sync_str),
         ("Next Alarm:", alarm),
-        ("Next Rem:", reminder),
+        ("Rem:", reminder),
         ("Auto Sync:", auto_sync)
     ]
 
