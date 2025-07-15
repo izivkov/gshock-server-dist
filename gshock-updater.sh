@@ -35,15 +35,20 @@ fi
 # Deploy if new
 if [ "$LATEST_TAG" != "$LAST_TAG" ]; then
     echo "New tag found: $LATEST_TAG"
-    rm -rf "$DIST_DIR"/*
-    git fetch --all
+    git fetch --all --tags
+
+    # Optional: ensure you're clean before switching
+    git reset --hard
+    git clean -fd
+
     git checkout "$LATEST_TAG"
+    
     echo "$LATEST_TAG" > "$LAST_TAG_FILE"
 
     echo "Restarting gshock.service"
     sudo systemctl restart gshock.service
 else
-    echo "No update needed. Current tag: $LATEST_TAG"
+    echo "No update needed. Current tag: $LATEST_TAG
 fi
 
 # Add cron job to run updater every 30 minutes
