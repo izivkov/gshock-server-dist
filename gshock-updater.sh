@@ -48,7 +48,7 @@ if [ "$LATEST_TAG" != "$LAST_TAG" ]; then
     echo "Restarting gshock.service"
     sudo systemctl restart gshock.service
 else
-    echo "No update needed. Current tag: $LATEST_TAG
+    echo "No update needed. Current tag: $LATEST_TAG"
 fi
 
 # Add cron job to run updater every 30 minutes
