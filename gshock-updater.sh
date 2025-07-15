@@ -45,14 +45,19 @@ fi
 # Add cron job to run updater every 30 minutes
 CRON_JOB="*/3 * * * * /usr/local/bin/gshock-updater.sh >> /var/log/gshock-updater.log 2>&1"
 
-# Check if the cron job already exists
-crontab -l 2>/dev/null | grep -F "$CRON_JOB" >/dev/null
+# Get current crontab or fallback to empty
+CURRENT_CRON=$(crontab -l 2>/dev/null)
 
-if [ $? -ne 0 ]; then
-    # Append the cron job if it's not found
-    (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
-    echo "Cron job added."
-else
+# Debug: show current crontab
+echo "Current crontab:"
+echo "$CURRENT_CRON"
+echo "-----"
+
+# Check if job already exists
+if echo "$CURRENT_CRON" | grep -Fq "$CRON_JOB"; then
     echo "Cron job already exists. Skipping."
+else
+    # Add job
+    (echo "$CURRENT_CRON"; echo "$CRON_JOB") | crontab -
+    echo "Cron job added."
 fi
-
