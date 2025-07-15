@@ -43,7 +43,7 @@ else
 fi
 
 # Add cron job to run updater every 30 minutes
-CRON_JOB="*/3 * * * * /usr/local/bin/gshock-updater.sh >> /var/log/gshock-updater.log 2>&1"
+CRON_JOB="*/3 * * * * $DIST_DIR/gshock-updater.sh >> /var/log/gshock-updater.log 2>&1"
 
 # Get current crontab or fallback to empty
 CURRENT_CRON=$(crontab -l 2>/dev/null)
