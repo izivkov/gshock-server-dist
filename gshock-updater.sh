@@ -35,7 +35,7 @@ fi
 # Deploy if new
 if [ "$LATEST_TAG" != "$LAST_TAG" ]; then
     echo "New tag found: $LATEST_TAG"
-    git fetch --all --tags
+    git fetch --tags --force
 
     # Optional: ensure you're clean before switching
     git reset --hard
