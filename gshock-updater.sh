@@ -28,7 +28,7 @@ else
     LAST_TAG=""
 fi
 
-# Deploy if new
+# Deploy if new.
 if [ "$LATEST_TAG" != "$LAST_TAG" ]; then
     echo "New tag found: $LATEST_TAG"
     rm -rf "$DIST_DIR"/*
