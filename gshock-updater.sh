@@ -3,7 +3,7 @@ set -e
 
 REPO_DIR="~/"
 REPO_URL="https://github.com/izivkov/gshock-server-dist.git"
-LAST_TAG_FILE="/var/lib/gshock-server/last-tag"
+LAST_TAG_FILE="$HOME/last-tag"
 
 # Make sure last-tag directory exists
 mkdir -p "$(dirname "$LAST_TAG_FILE")"
@@ -28,7 +28,7 @@ else
     LAST_TAG=""
 fi
 
-# Deploy if new.
+# Deploy if new
 if [ "$LATEST_TAG" != "$LAST_TAG" ]; then
     echo "New tag found: $LATEST_TAG"
     rm -rf "$DIST_DIR"/*
