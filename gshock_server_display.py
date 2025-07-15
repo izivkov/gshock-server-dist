@@ -133,11 +133,9 @@ async def run_time_server():
             last_sync = store.get("last_connected", "Unknown")
 
             logger.info("Waiting for Connection...")
-            oled.show_welcome_screen(
-                message="Waiting\nfor connection...",
-                watch_name=watch_name,
-                last_sync=last_sync
-            )
+
+            if watch_info is None or watch_info.name != watch_name:
+                oled.show_welcome_screen(message="Waiting\nfor connection...", watch_name=watch_name, last_sync=last_sync)
 
             connection = Connection(address)
             await connection.connect()
