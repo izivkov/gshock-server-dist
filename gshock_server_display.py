@@ -177,7 +177,7 @@ async def run_time_server():
                 oled.show_welcome_screen(
                     message="Waiting\nfor connection...",
                     watch_name=store.get("watch_name", "Unknown"),
-                    last_sync=last_sync
+                    last_sync=store.get("last_connected", "Unknown"),
                 )
 
             if watch_info.alwaysConnected is False:
