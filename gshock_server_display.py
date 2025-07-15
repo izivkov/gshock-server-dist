@@ -122,6 +122,7 @@ async def run_time_server():
 
     store = PersistentMap("gshock_server_data.json")
 
+    first_run = True
     while True:
         try:
             if args.multi_watch:
@@ -132,7 +133,7 @@ async def run_time_server():
             watch_name = store.get("watch_name", "Unknown")
             last_sync = store.get("last_connected", "Unknown")
 
-            if watch_name == "Unknown":
+            if watch_name == "Unknown" or first_run:
                 oled.show_welcome_screen(
                     message="Waiting\nfor connection...",
                     watch_name=watch_name,
@@ -143,6 +144,7 @@ async def run_time_server():
 
             connection = Connection(address)
             await connection.connect()
+            first_run = False
 
             # Show connected screen
             oled.show_welcome_screen("Connected!")
@@ -179,7 +181,6 @@ async def run_time_server():
                     watch_name=store.get("watch_name", "Unknown"),
                     last_sync=store.get("last_connected", "Unknown"),
                 )
-
             if watch_info.alwaysConnected is False:
                 await connection.disconnect()
             pass
