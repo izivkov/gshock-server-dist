@@ -20,7 +20,7 @@ from utils import run_once_key
 __author__ = "Ivo Zivkov"
 __copyright__ = "Ivo Zivkov"
 __license__ = "MIT"
-__tag__ = "1.0.6"
+__tag__ = "1.0.13"
 
 # This script is used to set the time on a G-Shock watch and display information on a connected display.
 
