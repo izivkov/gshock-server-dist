@@ -193,7 +193,10 @@ async def run_time_server():
 
             # Disconnect if needed
             if not watch_info.alwaysConnected:
-                await connection.disconnect()
+                try:
+                    await connection.disconnect()
+                except Exception as e:
+                    logger.error(f"Got error while disconnecting: {e}")
 
         except Exception as e:
             logger.error(f"Got error: {e}")
