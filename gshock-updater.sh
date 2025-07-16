@@ -50,6 +50,9 @@ if [ "$LATEST_TAG" != "$LAST_SYNCED_TAG" ]; then
     git clean -fd
     echo "$LATEST_TAG" > "$LAST_TAG_FILE"
     echo "Repository updated to $LATEST_TAG"
+
+    echo "Restarting gshock.service"
+    sudo systemctl restart gshock.service
 else
     echo "Already up to date with tag: $LATEST_TAG"
 fi
