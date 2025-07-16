@@ -20,7 +20,6 @@ from utils import run_once_key
 __author__ = "Ivo Zivkov"
 __copyright__ = "Ivo Zivkov"
 __license__ = "MIT"
-__tag__ = "1.0.13"
 
 # This script is used to set the time on a G-Shock watch and display information on a connected display.
 
@@ -137,7 +136,7 @@ async def run_time_server():
             run_once_key(
                 "show_welcome_screen",
                 oled.show_welcome_screen,
-                message="Waiting\nfor connection...",
+                message="Waiting\nfor connection...1",
                 watch_name=watch_name,
                 last_sync=last_sync,                
             )
@@ -179,7 +178,7 @@ async def run_time_server():
                 await show_display(api)
             else:
                 oled.show_welcome_screen(
-                    message="Waiting\nfor connection...",
+                    message="Waiting\nfor connection...1",
                     watch_name=store.get("watch_name", "Unknown"),
                     last_sync=store.get("last_connected", "Unknown"),
                 )
