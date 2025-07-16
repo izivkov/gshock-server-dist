@@ -117,24 +117,35 @@ async def show_display(api: GshockAPI):
 
 from peristent_store import PersistentMap
 
+async def safe_set_time(api, time_secs):
+    try:
+        await api.set_time(time_secs)
+    except Exception as e:
+        logger.error(f"Got error while setting time: {e}")
+
+async def safe_show_display(api):
+    try:
+        await show_display(api)
+    except Exception as e:
+        logger.error(f"Got error while showing display: {e}")
+
 async def run_time_server():
     prompt()
-
     store = PersistentMap("gshock_server_data.json")
 
-    first_run = True
     while True:
+        pressed_button = WatchButton.NO_BUTTON  # Always defined
+        connection = None  # In case connection creation fails
+
         try:
-            pressed_button = WatchButton.NO_BUTTON  # <== Initialize here
+            # Get device address
+            address = None if args.multi_watch else conf.get("device.address")
 
-            if args.multi_watch:
-                address = None
-            else:
-                address = conf.get("device.address")
-
+            # Load last known values
             watch_name = store.get("watch_name", "Unknown")
             last_sync = store.get("last_connected", "Unknown")
 
+            # Show welcome screen only once
             run_once_key(
                 "show_welcome_screen",
                 oled.show_welcome_screen,
@@ -145,48 +156,51 @@ async def run_time_server():
 
             logger.info("Waiting for Connection...")
 
+            # Connect to watch
             connection = Connection(address)
             await connection.connect()
-            first_run = False
 
+            # Show connected screen
             oled.show_welcome_screen("Connected!")
 
+            # Update store
             store.add("last_connected", datetime.now().strftime("%m/%d %H:%M"))
             store.add("watch_name", watch_info.name)
 
+            # Create API interface and wait for button
             api = GshockAPI(connection)
             pressed_button = await api.get_pressed_button()
 
-            if (
-                pressed_button != WatchButton.LOWER_RIGHT
-                and pressed_button != WatchButton.NO_BUTTON
-                and pressed_button != WatchButton.LOWER_LEFT
-            ):
+            # Only continue if relevant buttons were pressed
+            if pressed_button not in [WatchButton.LOWER_RIGHT, WatchButton.NO_BUTTON, WatchButton.LOWER_LEFT]:
                 continue
 
+            # Set the time with fine adjustment
             fine_adjustment_secs = args.fine_adjustment_secs
-            await api.set_time(int(time.time()) + fine_adjustment_secs)
+            await safe_set_time(api, int(time.time()) + fine_adjustment_secs)
 
             logger.info(f"Time set at {datetime.now()} on {watch_info.name}")
+
+            # Display next view depending on button
+            if pressed_button == WatchButton.LOWER_LEFT:
+                await safe_show_display(api)
+            else:
+                oled.show_welcome_screen(
+                    message="Waiting\nfor connection...4",
+                    watch_name=store.get("watch_name", "Unknown"),
+                    last_sync=store.get("last_connected", "Unknown"),
+                )
+
+            # Disconnect if needed
+            if not watch_info.alwaysConnected:
+                await connection.disconnect()
 
         except Exception as e:
             logger.error(f"Got error: {e}")
 
         finally:
-            try:
-                if pressed_button == WatchButton.LOWER_LEFT:
-                    await show_display(api)
-                elif pressed_button in [WatchButton.LOWER_RIGHT, WatchButton.NO_BUTTON]:
-                    oled.show_welcome_screen(
-                        message="Waiting\nfor connection...4",
-                        watch_name=store.get("watch_name", "Unknown"),
-                        last_sync=store.get("last_connected", "Unknown"),
-                    )
-            except Exception as e:
-                logger.error(f"Got exception in finally: {e}")
-
-            if watch_info.alwaysConnected is False:
-                await connection.disconnect()
+            # Optional: handle any cleanup here
+            pass
 
 if __name__ == "__main__":
     asyncio.run(main(sys.argv[1:]))
