@@ -136,7 +136,7 @@ async def run_time_server():
             run_once_key(
                 "show_welcome_screen",
                 oled.show_welcome_screen,
-                message="Waiting\nfor connection...2",
+                message="Waiting\nfor connection...3",
                 watch_name=watch_name,
                 last_sync=last_sync,                
             )
@@ -173,17 +173,20 @@ async def run_time_server():
             logger.error(f"Got error: {e}")
 
         finally:
-            # Only show full display if LOWER_LEFT was pressed
-            if pressed_button == WatchButton.LOWER_LEFT:
-                await show_display(api)
-            else:
-                oled.show_welcome_screen(
-                    message="Waiting\nfor connection...2",
-                    watch_name=store.get("watch_name", "Unknown"),
-                    last_sync=store.get("last_connected", "Unknown"),
-                )
-            if watch_info.alwaysConnected is False:
-                await connection.disconnect()
+            try:
+                # Only show full display if LOWER_LEFT was pressed
+                if pressed_button == WatchButton.LOWER_LEFT:
+                    await show_display(api)
+                else:
+                    oled.show_welcome_screen(
+                        message="Waiting\nfor connection...3",
+                        watch_name=store.get("watch_name", "Unknown"),
+                        last_sync=store.get("last_connected", "Unknown"),
+                    )
+                if watch_info.alwaysConnected is False:
+                    await connection.disconnect()
+            except Exception as e:
+                logger.error(f"Got exception in finally: {e}")
 
 if __name__ == "__main__":
     asyncio.run(main(sys.argv[1:]))
