@@ -185,11 +185,14 @@ async def run_time_server():
             if pressed_button == WatchButton.LOWER_LEFT:
                 await safe_show_display(api)
             else:
-                oled.show_welcome_screen(
-                    message="Waiting\nfor connection...4",
-                    watch_name=store.get("watch_name", "Unknown"),
-                    last_sync=store.get("last_connected", "Unknown"),
-                )
+                try:
+                    oled.show_welcome_screen(
+                        message="Waiting\nfor connection...4",
+                        watch_name=store.get("watch_name", "Unknown"),
+                        last_sync=store.get("last_connected", "Unknown"),
+                    )
+                except Exception as e:
+                    logger.error(f"Got error while showing welcome screen: {e}")
 
             # Disconnect if needed
             if not watch_info.alwaysConnected:
