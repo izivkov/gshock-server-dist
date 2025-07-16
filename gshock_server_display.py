@@ -125,6 +125,8 @@ async def run_time_server():
     first_run = True
     while True:
         try:
+            pressed_button = WatchButton.NO_BUTTON  # <== Initialize here
+
             if args.multi_watch:
                 address = None
             else:
@@ -138,7 +140,7 @@ async def run_time_server():
                 oled.show_welcome_screen,
                 message="Waiting\nfor connection...3",
                 watch_name=watch_name,
-                last_sync=last_sync,                
+                last_sync=last_sync,
             )
 
             logger.info("Waiting for Connection...")
@@ -147,7 +149,6 @@ async def run_time_server():
             await connection.connect()
             first_run = False
 
-            # Show connected screen
             oled.show_welcome_screen("Connected!")
 
             store.add("last_connected", datetime.now().strftime("%m/%d %H:%M"))
@@ -163,7 +164,6 @@ async def run_time_server():
             ):
                 continue
 
-            # Apply fine adjustment to the time
             fine_adjustment_secs = args.fine_adjustment_secs
             await api.set_time(int(time.time()) + fine_adjustment_secs)
 
@@ -174,10 +174,9 @@ async def run_time_server():
 
         finally:
             try:
-                # Only show full display if LOWER_LEFT was pressed
                 if pressed_button == WatchButton.LOWER_LEFT:
                     await show_display(api)
-                else:
+                elif pressed_button in [WatchButton.LOWER_RIGHT, WatchButton.NO_BUTTON]:
                     oled.show_welcome_screen(
                         message="Waiting\nfor connection...3",
                         watch_name=store.get("watch_name", "Unknown"),
@@ -191,3 +190,6 @@ async def run_time_server():
 
 if __name__ == "__main__":
     asyncio.run(main(sys.argv[1:]))
+
+
+
