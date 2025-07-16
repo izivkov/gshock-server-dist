@@ -35,13 +35,11 @@ fi
 # Deploy if new
 if [ "$LATEST_TAG" != "$LAST_TAG" ]; then
     echo "New tag found: $LATEST_TAG"
-    git fetch --tags --force
-
-    # Optional: ensure you're clean before switching
-    git reset --hard
-    git clean -fd
+    git fetch origin $LATEST_TAG --force
 
     git checkout "$LATEST_TAG"
+    git reset --hard "$LATEST_TAG"
+    git clean -fd
     
     echo "$LATEST_TAG" > "$LAST_TAG_FILE"
 
