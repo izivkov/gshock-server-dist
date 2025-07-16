@@ -52,7 +52,9 @@ if [ "$LATEST_TAG" != "$LAST_SYNCED_TAG" ]; then
     echo "Repository updated to $LATEST_TAG"
 
     echo "Restarting gshock.service"
-    sudo systemctl restart gshock.service
+    sudo systemctl stop gshock.service
+    sudo systemctl start gshock.service
+
 else
     echo "Already up to date with tag: $LATEST_TAG"
 fi
