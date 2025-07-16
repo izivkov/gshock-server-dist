@@ -179,7 +179,7 @@ async def run_time_server():
                 await show_display(api)
             else:
                 oled.show_welcome_screen(
-                    message="Waiting\nfor connection...",
+                    message="Waiting\nfor connection... (1.0.9)",
                     watch_name=store.get("watch_name", "Unknown"),
                     last_sync=store.get("last_connected", "Unknown"),
                 )
