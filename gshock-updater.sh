@@ -19,35 +19,41 @@ fi
 
 cd "$REPO_DIR"
 
-# Fetch tags only
-git fetch --tags
+#!/bin/bash
+set -e
 
-# Get latest tag name
-LATEST_TAG=$(git tag | sort -V | tail -n 1)
+# File to store the last tag used
+LAST_TAG_FILE="last_tag"
 
-# Read last deployed tag
-if [ -f "$LAST_TAG_FILE" ]; then
-    LAST_TAG=$(cat "$LAST_TAG_FILE")
-else
-    LAST_TAG=""
+# Fetch the latest tags from remote
+git fetch --tags --force
+
+# Find the latest tag available, sorted by version name
+LATEST_TAG=$(git tag --sort=-v:refname | head -n 1)
+
+if [ -z "$LATEST_TAG" ]; then
+    echo "No tags found in repository."
+    exit 1
 fi
 
-# Deploy if new
-if [ "$LATEST_TAG" != "$LAST_TAG" ]; then
-    echo "New tag found: $LATEST_TAG"
-    git fetch origin $LATEST_TAG --force
+# Read last synced tag (if file exists)
+if [ -f "$LAST_TAG_FILE" ]; then
+    LAST_SYNCED_TAG=$(cat "$LAST_TAG_FILE")
+else
+    LAST_SYNCED_TAG=""
+fi
 
-    git checkout "$LATEST_TAG"
+# Compare and update if different
+if [ "$LATEST_TAG" != "$LAST_SYNCED_TAG" ]; then
+    echo "New tag found: $LATEST_TAG (was: $LAST_SYNCED_TAG)"
     git reset --hard "$LATEST_TAG"
     git clean -fd
-    
     echo "$LATEST_TAG" > "$LAST_TAG_FILE"
-
-    echo "Restarting gshock.service"
-    sudo systemctl restart gshock.service
+    echo "Repository updated to $LATEST_TAG"
 else
-    echo "No update needed. Current tag: $LATEST_TAG"
+    echo "Already up to date with tag: $LATEST_TAG"
 fi
+# End of update
 
 # Add cron job to run updater every 30 minutes
 CRON_JOB="*/1 * * * * $DIST_DIR/gshock-updater.sh >> $LOG_FILE 2>&1"
