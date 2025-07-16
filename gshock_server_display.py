@@ -183,10 +183,11 @@ async def run_time_server():
                         watch_name=store.get("watch_name", "Unknown"),
                         last_sync=store.get("last_connected", "Unknown"),
                     )
-                if watch_info.alwaysConnected is False:
-                    await connection.disconnect()
             except Exception as e:
                 logger.error(f"Got exception in finally: {e}")
+
+            if watch_info.alwaysConnected is False:
+                await connection.disconnect()
 
 if __name__ == "__main__":
     asyncio.run(main(sys.argv[1:]))
