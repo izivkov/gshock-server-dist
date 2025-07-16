@@ -185,7 +185,6 @@ async def run_time_server():
                 )
             if watch_info.alwaysConnected is False:
                 await connection.disconnect()
-            pass
 
 if __name__ == "__main__":
     asyncio.run(main(sys.argv[1:]))
