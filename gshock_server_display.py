@@ -16,6 +16,7 @@ from datetime import datetime, timedelta
 from gshock_api.watch_info import watch_info
 from gshock_api.exceptions import GShockConnectionError
 from utils import run_once_key
+from peristent_store import PersistentMap
 
 __author__ = "Ivo Zivkov"
 __copyright__ = "Ivo Zivkov"
@@ -25,6 +26,8 @@ __license__ = "MIT"
 
 async def main(argv):
     await run_time_server()
+
+store = PersistentMap("gshock_server_data.json")
 
 def prompt():
     logger.info(
@@ -115,8 +118,6 @@ async def show_display(api: GshockAPI):
     except Exception as e:
         logger.error(f"Got error: {e}")
 
-from peristent_store import PersistentMap
-
 async def safe_set_time(api, time_secs):
     try:
         await api.set_time(time_secs)
@@ -131,7 +132,6 @@ async def safe_show_display(api):
 
 async def run_time_server():
     prompt()
-    store = PersistentMap("gshock_server_data.json")
 
     while True:
         pressed_button = WatchButton.NO_BUTTON  # Always defined
@@ -141,17 +141,13 @@ async def run_time_server():
             # Get device address
             address = None if args.multi_watch else conf.get("device.address")
 
-            # Load last known values
-            watch_name = store.get("watch_name", "Unknown")
-            last_sync = store.get("last_connected", "Unknown")
-
             # Show welcome screen only once
             run_once_key(
                 "show_welcome_screen",
                 oled.show_welcome_screen,
-                message="Waiting\nfor connection...3",
-                watch_name=watch_name,
-                last_sync=last_sync,
+                "Waiting\nfor connection...",
+                watch_name=store.get("watch_name", None),
+                last_sync=store.get("last_connected", None),
             )
 
             logger.info("Waiting for Connection...")
@@ -161,7 +157,7 @@ async def run_time_server():
             await connection.connect()
 
             # Show connected screen
-            oled.show_welcome_screen("Connected!")
+            oled.show_welcome_screen(message="Connected!")
 
             # Update store
             store.add("last_connected", datetime.now().strftime("%m/%d %H:%M"))
@@ -185,14 +181,11 @@ async def run_time_server():
             if pressed_button == WatchButton.LOWER_LEFT:
                 await safe_show_display(api)
             else:
-                try:
-                    oled.show_welcome_screen(
-                        message="Waiting\nfor connection...4",
-                        watch_name=store.get("watch_name", "Unknown"),
-                        last_sync=store.get("last_connected", "Unknown"),
-                    )
-                except Exception as e:
-                    logger.error(f"Got error while showing welcome screen: {e}")
+                oled.show_welcome_screen(
+                    "Waiting\nfor connection...",
+                    watch_name=store.get("watch_name", None),
+                    last_sync=store.get("last_connected", None),
+                )
 
             # Disconnect if needed
             if not watch_info.alwaysConnected:
@@ -203,6 +196,12 @@ async def run_time_server():
 
         except Exception as e:
             logger.error(f"Got error: {e}")
+
+            oled.show_welcome_screen(
+                "Waiting\nfor connection...",
+                watch_name=store.get("watch_name", None),
+                last_sync=store.get("last_connected", None),
+            )
 
         finally:
             # Optional: handle any cleanup here
