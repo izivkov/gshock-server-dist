@@ -178,7 +178,7 @@ async def run_time_server():
                     await show_display(api)
                 elif pressed_button in [WatchButton.LOWER_RIGHT, WatchButton.NO_BUTTON]:
                     oled.show_welcome_screen(
-                        message="Waiting\nfor connection...3",
+                        message="Waiting\nfor connection...4",
                         watch_name=store.get("watch_name", "Unknown"),
                         last_sync=store.get("last_connected", "Unknown"),
                     )
