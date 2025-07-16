@@ -170,7 +170,7 @@ async def run_time_server():
 
             logger.info(f"Time set at {datetime.now()} on {watch_info.name}")
 
-        except GShockConnectionError as e:
+        except Exception as e:
             logger.error(f"Got error: {e}")
 
         finally:
