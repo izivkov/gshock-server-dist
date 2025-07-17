@@ -132,15 +132,14 @@ async def safe_show_display(api):
         logger.error(f"Got error while showing display: {e}")
 
 async def run_time_server():
+    pressed_button = WatchButton.NO_BUTTON  # Always defined
+    
     prompt()
 
     while True:
-        pressed_button = WatchButton.NO_BUTTON  # Always defined
         connection = None  # In case connection creation fails
 
         # Wait for a second in case of tight loop
-        time.sleep(1)  # Wait for a second before checking again
-
         try:
             # Get device address
             address = None if args.multi_watch else conf.get("device.address")
@@ -156,6 +155,8 @@ async def run_time_server():
                 )
 
             logger.info("Waiting for Connection...")
+
+            time.sleep(1)  # Wait for a second before checking again
 
             # Connect to watch
             connection = Connection(address)
