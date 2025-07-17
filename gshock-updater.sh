@@ -22,9 +22,6 @@ cd "$REPO_DIR"
 #!/bin/bash
 set -e
 
-# File to store the last tag used
-LAST_TAG_FILE="last_tag"
-
 # Fetch the latest tags from remote
 git fetch --tags --force
 
