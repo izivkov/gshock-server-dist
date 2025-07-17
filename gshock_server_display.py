@@ -133,30 +133,27 @@ async def safe_show_display(api):
 
 async def run_time_server():
     pressed_button = WatchButton.NO_BUTTON  # Always defined
-    
     prompt()
 
     while True:
         connection = None  # In case connection creation fails
 
-        # Wait for a second in case of tight loop
         try:
             # Get device address
             address = None if args.multi_watch else conf.get("device.address")
 
-            # Display next view depending on button
-            if pressed_button == WatchButton.LOWER_LEFT:
-                await safe_show_display(api)
-            elif pressed_button == WatchButton.LOWER_RIGHT or pressed_button == WatchButton.NO_BUTTON:
-                oled.show_welcome_screen(
-                    "Waiting\nfor connection...",
-                    watch_name=store.get("watch_name", None),
-                    last_sync=store.get("last_connected", None),
-                )
+            # Show welcome screen only once
+            run_once_key(
+                "show_welcome_screen",
+                oled.show_welcome_screen,
+                "Waiting\nfor connection...40.1",
+                watch_name=store.get("watch_name", None),
+                last_sync=store.get("last_connected", None),
+            )
+
+            time.sleep(1)  # Pause some time to avoid possible tight loop
 
             logger.info("Waiting for Connection...")
-
-            time.sleep(1)  # Wait for a second before checking again
 
             # Connect to watch
             connection = Connection(address)
@@ -173,11 +170,25 @@ async def run_time_server():
             api = GshockAPI(connection)
             pressed_button = await api.get_pressed_button()
 
+            # Only continue if relevant buttons were pressed
+            if pressed_button not in [WatchButton.LOWER_RIGHT, WatchButton.NO_BUTTON, WatchButton.LOWER_LEFT]:
+                continue
+
             # Set the time with fine adjustment
             fine_adjustment_secs = args.fine_adjustment_secs
             await safe_set_time(api, int(time.time()) + fine_adjustment_secs)
 
             logger.info(f"Time set at {datetime.now()} on {watch_info.name}")
+
+            # Display next view depending on button
+            if pressed_button == WatchButton.LOWER_LEFT:
+                await safe_show_display(api)
+            elif pressed_button == WatchButton.LOWER_RIGHT or pressed_button == WatchButton.NO_BUTTON:
+                oled.show_welcome_screen(
+                    "Waiting\nfor connection...",
+                    watch_name=store.get("watch_name", None),
+                    last_sync=store.get("last_connected", None),
+                )
 
             # Disconnect if needed
             if not watch_info.alwaysConnected:
@@ -188,6 +199,16 @@ async def run_time_server():
 
         except Exception as e:
             logger.error(f"Got error: {e}")
+
+            oled.show_welcome_screen(
+                "Waiting\nfor connection...",
+                watch_name=store.get("watch_name", None),
+                last_sync=store.get("last_connected", None),
+            )
+
+        finally:
+            # Optional: handle any cleanup here
+            pass
 
 if __name__ == "__main__":
     asyncio.run(main(sys.argv[1:]))
