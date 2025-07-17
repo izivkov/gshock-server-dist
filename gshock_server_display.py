@@ -21,7 +21,7 @@ from peristent_store import PersistentMap
 __author__ = "Ivo Zivkov"
 __copyright__ = "Ivo Zivkov"
 __license__ = "MIT"
-__tag__ = "v1.0.38"
+__tag__ = "v1.0.39"
 
 # This script is used to set the time on a G-Shock watch and display information on a connected display.
 
@@ -146,7 +146,7 @@ async def run_time_server():
             run_once_key(
                 "show_welcome_screen",
                 oled.show_welcome_screen,
-                "Waiting\nfor connection...38.1",
+                "Waiting\nfor connection...39.1",
                 watch_name=store.get("watch_name", None),
                 last_sync=store.get("last_connected", None),
             )
@@ -183,7 +183,7 @@ async def run_time_server():
                 await safe_show_display(api)
             else:
                 oled.show_welcome_screen(
-                    "Waiting\nfor connection...38.2",
+                    "Waiting\nfor connection...39.2",
                     watch_name=store.get("watch_name", None),
                     last_sync=store.get("last_connected", None),
                 )
@@ -199,7 +199,7 @@ async def run_time_server():
             logger.error(f"Got error: {e}")
 
             oled.show_welcome_screen(
-                "Waiting\nfor connection...38.3",
+                "Waiting\nfor connection...39.3",
                 watch_name=store.get("watch_name", None),
                 last_sync=store.get("last_connected", None),
             )
