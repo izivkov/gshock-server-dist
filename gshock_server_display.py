@@ -21,7 +21,7 @@ from peristent_store import PersistentMap
 __author__ = "Ivo Zivkov"
 __copyright__ = "Ivo Zivkov"
 __license__ = "MIT"
-__tag__ = "v1.0.25"
+__tag__ = "v1.0.30"
 
 # This script is used to set the time on a G-Shock watch and display information on a connected display.
 
