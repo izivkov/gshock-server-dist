@@ -151,13 +151,14 @@ async def run_time_server():
                 last_sync=store.get("last_connected", None),
             )
 
-            time.sleep(1)  # Pause some time to avoid possible tight loop
-
             logger.info("Waiting for Connection...")
 
             # Connect to watch
             connection = Connection(address)
-            await connection.connect()
+            connected = await connection.connect()
+            if not connected:
+                logger.info("Failed to connect")
+                continue
 
             # Show connected screen
             oled.show_welcome_screen(message="Connected!")
