@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# This script will enable the Linux driver needed for the display. Without this step, the display will not work.
+# Reboot when asked after the script runs.
+
 echo "== Enabling SPI interface =="
 
 CONFIG_FILE="/boot/firmware/config.txt"

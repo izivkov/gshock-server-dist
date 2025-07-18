@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Installs all display-related dependencies. While installing, it will ask you to select the display type.
+# Note: You need to run both setup.sh and setup-display.sh.
+
 echo "== Display setup =="
 
 # Update & upgrade

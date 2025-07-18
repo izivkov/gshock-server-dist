@@ -2,6 +2,9 @@
 
 set -e
 
+# This script installs the basic software, dependencies, sets up a service to start the server each time 
+# the device is rebooted, etc. For a device with no display, this is sufficient to run the server.
+
 INSTALL_DIR="$(cd "$(dirname "$0")"; pwd)"
 SERVICE_USER="$(whoami)"
 VENV_DIR="$HOME/venv"

@@ -1,4 +1,9 @@
 #!/bin/bash
+
+# This script will set the device to automatically update its software if a new version is available on GitHub.
+# It will then restart the server, so you will always be running the latest version. The scripts sets us a cron job to
+# run periodically and check for new tags on the `gshock-server-dist` GitHub repository.
+
 set -e
 
 REPO_NAME="gshock-server-dist"
