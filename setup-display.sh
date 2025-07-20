@@ -3,6 +3,8 @@
 # Installs all display-related dependencies. While installing, it will ask you to select the display type.
 # Note: You need to run both setup.sh and setup-display.sh.
 
+set -e
+
 echo "== Display setup =="
 
 # Update & upgrade
@@ -37,7 +39,7 @@ Description=G-Shock Time Server
 After=network.target
 
 [Service]
-ExecStart=$VENV_DIR/bin/python $INSTALL_DIR/gshock_server_display.py --multi-watch --display $DISPLAY_TYPE
+ExecStart=$VENV_DIR/bin/python $INSTALL_DIR/gshock_server_display.py --display $DISPLAY_TYPE
 WorkingDirectory=$INSTALL_DIR
 Environment=PYTHONUNBUFFERED=1
 Restart=on-failure

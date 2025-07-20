@@ -9,10 +9,6 @@ class Args:
         parser = argparse.ArgumentParser(description="Parser")
         
         parser.add_argument(
-            "--multi-watch",
-            action='store_true',
-            help="--multi-watch allows use of multimple watches")
-        parser.add_argument(
             "--fine-adjustment-secs",
             type=int,
             choices=range(-10, 11),
