@@ -32,7 +32,7 @@ else
 fi
 
 # Update config.ini with the selected display type
-CONFIG_FILE="$DIST_DIR/config.ini"
+CONFIG_FILE="./config.ini"
 
 # Validate DISPLAY_TYPE
 case "$DISPLAY_TYPE" in
