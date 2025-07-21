@@ -8,7 +8,7 @@ from gshock_api.connection import Connection
 from gshock_api.gshock_api import GshockAPI
 from gshock_api.iolib.button_pressed_io import WatchButton
 from gshock_api.scanner import scanner
-from gshock_api.configurator import conf
+from configurator import conf
 from gshock_api.logger import logger
 from gshock_api.watch_info import watch_info
 from args import args

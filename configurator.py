@@ -36,5 +36,4 @@ class Configurator:
         with open(self.path, "w") as f:
             self.config.write(f)
 
-
 conf = Configurator()
