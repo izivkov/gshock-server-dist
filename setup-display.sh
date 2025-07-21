@@ -41,7 +41,11 @@ else
 fi
 
 # Update config.ini with the selected display type
-CONFIG_FILE="./config.ini"
+CONFIG_DIR="$HOME/.config/gshock"
+CONFIG_FILE="$CONFIG_DIR/config.ini"
+
+# Create the directory if it doesn't exist
+mkdir -p "$CONFIG_DIR"
 
 # Validate DISPLAY_TYPE
 case "$DISPLAY_TYPE" in
