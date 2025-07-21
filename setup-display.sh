@@ -7,6 +7,15 @@ set -e
 
 echo "== Display setup =="
 
+INSTALL_DIR="$(cd "$(dirname "$0")"; pwd)"
+VENV_DIR="$HOME/venv"
+
+# Setup virtual environment in home directory
+if [ ! -d "$VENV_DIR" ]; then
+  python3 -m venv "$VENV_DIR"
+fi
+source "$VENV_DIR/bin/activate"
+
 # Update & upgrade
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y python3-pip python3-venv zip unzip \
