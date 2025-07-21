@@ -46,9 +46,7 @@ esac
 
 echo "Display type set to: $DISPLAY_TYPE"
 
-echo "[main]" > "$CONFIG_FILE"
 echo "display = $DISPLAY_TYPE" >> "$CONFIG_FILE"
-echo excluded_watches = '["OCW-S400-2AJF", "OCW-S400SG-2AJR", "OCW-T200SB-1AJF", "ECB-30", "ECB-20", "ECB-10", "ECB-50", "ECB-60", "ECB-70"]' >> "$CONFIG_FILE"
 
 # end of config.ini update
 
