@@ -60,8 +60,12 @@ esac
 
 echo "Display type set to: $DISPLAY_TYPE"
 
-echo "display = $DISPLAY_TYPE" >> "$CONFIG_FILE"
-
+# If file exists and has 'display' key, replace it
+if grep -qE '^\s*display\s*=' "$CONFIG_FILE"; then
+    sed -i "s|^\s*display\s*=.*|display = $DISPLAY_TYPE|" "$CONFIG_FILE"
+else
+    echo "display = $DISPLAY_TYPE" >> "$CONFIG_FILE"
+fi
 # end of config.ini update
 
 # Overwrite systemd service with display version
