@@ -57,7 +57,7 @@ def get_display(display_type: str):
     else:
         raise ValueError(f"Unsupported display type: {display_type}")
 
-oled = get_display(conf.get("display"))
+oled = get_display(args.display)
 
 def get_next_alarm_time(alarms):
     now = datetime.now()
