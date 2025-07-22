@@ -41,13 +41,6 @@ else
   DISPLAY_TYPE="tft154"
 fi
 
-# Update config.ini with the selected display type
-CONFIG_DIR="$HOME/.config/gshock"
-CONFIG_FILE="$CONFIG_DIR/config.ini"
-
-# Create the directory if it doesn't exist
-mkdir -p "$CONFIG_DIR"
-
 # Validate DISPLAY_TYPE
 case "$DISPLAY_TYPE" in
     waveshare|tft154|mock)
@@ -60,14 +53,6 @@ esac
 
 echo "Display type set to: $DISPLAY_TYPE"
 
-# If file exists and has 'display' key, replace it
-if grep -qE '^\s*display\s*=' "$CONFIG_FILE"; then
-    sed -i "s|^\s*display\s*=.*|display = $DISPLAY_TYPE|" "$CONFIG_FILE"
-else
-    echo "display = $DISPLAY_TYPE" >> "$CONFIG_FILE"
-fi
-# end of config.ini update
-
 # Overwrite systemd service with display version
 SERVICE_FILE="/etc/systemd/system/gshock.service"
 sudo tee "$SERVICE_FILE" > /dev/null <<EOL
@@ -76,7 +61,7 @@ Description=G-Shock Time Server
 After=network.target
 
 [Service]
-ExecStart=$VENV_DIR/bin/python $INSTALL_DIR/gshock_server_display.py
+ExecStart=$VENV_DIR/bin/python $INSTALL_DIR/gshock_server_display.py --display $DISPLAY_TYPE
 WorkingDirectory=$INSTALL_DIR
 Environment=PYTHONUNBUFFERED=1
 Restart=on-failure
