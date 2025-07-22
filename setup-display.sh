@@ -9,6 +9,7 @@ echo "== Display setup =="
 
 INSTALL_DIR="$(cd "$(dirname "$0")"; pwd)"
 VENV_DIR="$HOME/venv"
+SERVICE_USER="$(whoami)"
 
 # Setup virtual environment in home directory
 if [ ! -d "$VENV_DIR" ]; then
