@@ -65,7 +65,6 @@ User=$SERVICE_USER
 WantedBy=multi-user.target
 EOL
 
-
 sudo systemctlsudo systemctl enable NetworkManager-wait-online.service
 
 sudo systemctl daemon-reload

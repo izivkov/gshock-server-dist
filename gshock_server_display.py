@@ -137,7 +137,7 @@ async def run_time_server():
 
     while not ensure_bt_ready():
         logger.error("Bluetooth not ready after 10 seconds")
-
+        
     prompt()
 
     while True:
