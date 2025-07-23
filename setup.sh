@@ -39,7 +39,7 @@ pip install -r "$INSTALL_DIR/requirements.txt"
 CONFIG_DIR="$HOME/.config/gshock"
 CONFIG_FILE="$CONFIG_DIR/config.ini"
 
-echo sudo /sbin/iwconfig wlan0 power off > "$RC_FILE"
+echo 'sudo /sbin/iwconfig wlan0 power off' | sudo tee /etc/rc.local > "$RC_FILE"
 
 # Create the directory if it doesn't exist
 mkdir -p "$CONFIG_DIR"
