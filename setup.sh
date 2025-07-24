@@ -67,8 +67,6 @@ User=$SERVICE_USER
 WantedBy=multi-user.target
 EOL
 
-sudo systemctlsudo systemctl enable NetworkManager-wait-online.service
-
 sudo systemctl daemon-reload
 sudo systemctl enable gshock.service
 sudo systemctl start gshock.service

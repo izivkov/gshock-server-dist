@@ -49,7 +49,6 @@ def show_welcome_screen(self, message, watch_name=None, last_sync=None):
             else "display/pic/dw-b5600.png"
 
         logger.info (f"img_path: {img_path}")
-
         import os
         cwd = os.getcwd()
         logger.info("Current working directory:", cwd)
