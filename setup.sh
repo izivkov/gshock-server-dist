@@ -8,7 +8,7 @@ set -e
 INSTALL_DIR="$(cd "$(dirname "$0")"; pwd)"
 SERVICE_USER="$(whoami)"
 VENV_DIR="$HOME/venv"
-RC_FILE = "/etc/rc.local"
+RC_FILE="/etc/rc.local"
 
 echo "== G-Shock Server Installer for Linux =="
 
