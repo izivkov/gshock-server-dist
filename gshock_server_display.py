@@ -142,6 +142,9 @@ async def run_time_server():
 
     while True:
         connection = None  # In case connection creation fails
+        
+        # avoud tight loops
+        time.sleep(1)
 
         try:
             # Show welcome screen only once
