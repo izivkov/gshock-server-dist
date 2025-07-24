@@ -40,7 +40,7 @@ CONFIG_DIR="$HOME/.config/gshock"
 CONFIG_FILE="$CONFIG_DIR/config.ini"
 
 # Disable power-saving mode for the WiFi, otherwize it disconnects after some time.
-echo 'sudo /sbin/iwconfig wlan0 power off' | sudo tee /etc/rc.local > "$RC_FILE"
+echo 'sudo /sbin/iwconfig wlan0 power off' | sudo tee /etc/rc.local > /dev/null
 
 mkdir -p "$CONFIG_DIR"
 echo "[main]" > "$CONFIG_FILE"
