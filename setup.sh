@@ -72,9 +72,10 @@ EOL
 sudo systemctl daemon-reload
 sudo systemctl enable gshock.service
 sudo systemctl start gshock.service
+echo "✅ gshock.service installed and started."
 
 # run commands on boot
-sudo tee "$BOOT_SCRIPT" > /dev/null <<EOL
+tee "$BOOT_SCRIPT" > /dev/null <<EOL
 #!/bin/bash
 
 # Log the time
@@ -87,4 +88,25 @@ EOL
 
 chmod +x "$BOOT_SCRIPT"
 
-echo "✅ gshock.service installed and started."
+# Create and enable BOOT service
+BOOT_SERVICE_FILE="/etc/systemd/system/user-boot-script.service"
+sudo tee "$BOOT_SERVICE_FILE" > /dev/null <<EOL
+[Unit]
+Description=Run Pi user’s boot script
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pi
+ExecStart=/home/pi/onboot.sh
+Type=oneshot
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
+EOL
+
+# Enable the service
+sudo systemctl daemon-reload
+sudo systemctl enable user-boot-script.service
+
