@@ -85,4 +85,6 @@ sudo /usr/sbin/iw wlan0 set power_save off
 sudo iw dev wlan0 get power_save
 EOL
 
+chmod +x "$BOOT_SCRIPT"
+
 echo "✅ gshock.service installed and started."
