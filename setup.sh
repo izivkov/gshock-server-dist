@@ -97,8 +97,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-User="$SERVICE_USER"
-ExecStart=/home/$SERVICE_USER/onboot.sh
+ExecStart=/bin/bash -c "sudo -u pi /home/pi/onboot.sh"
 Type=oneshot
 RemainAfterExit=true
 
