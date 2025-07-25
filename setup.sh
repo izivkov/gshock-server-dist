@@ -91,6 +91,9 @@ done
 # Run your commands here
 echo "Disabling Wi-Fi power save"
 sudo /usr/sbin/iw wlan0 set power_save off >> /home/pi/boot.log 2>&1
+
+sleep 10
+sudo systemctl restart gshock.service >> /home/pi/boot.log 2>&1
 EOL
 
 chmod +x "$BOOT_SCRIPT"
@@ -115,4 +118,5 @@ EOL
 # Enable the service
 sudo systemctl daemon-reload
 sudo systemctl enable user-boot-script.service
+sudo systemctl start user-boot-script.service
 
