@@ -9,7 +9,7 @@ INSTALL_DIR="$(cd "$(dirname "$0")"; pwd)"
 SERVICE_USER="$(whoami)"
 VENV_DIR="$HOME/venv"
 BOOT_SCRIPT="$HOME/onboot.sh"
-LOG_FIR="$HOME/logs"
+LOG_DIR="$HOME/logs"
 
 echo "== G-Shock Server Installer for Linux =="
 
@@ -74,11 +74,11 @@ sudo systemctl enable gshock.service
 sudo systemctl start gshock.service
 
 # run commands on boot
-sudo tee "$BOOT_FILE" > /dev/null <<EOL
+sudo tee "$BOOT_SCRIPT" > /dev/null <<EOL
 #!/bin/bash
 
 # Log the time
-echo "Boot script started at $(date)" >> /home/pi/logs/boot.log
+echo "Boot script started at $(date)" >> "$LOG_DIR/boot.log"
 
 # Run this command as root
 sudo /usr/sbin/iw wlan0 set power_save off
