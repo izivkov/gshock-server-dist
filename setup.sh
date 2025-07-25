@@ -78,12 +78,19 @@ echo "✅ gshock.service installed and started."
 tee "$BOOT_SCRIPT" > /dev/null <<EOL
 #!/bin/bash
 
-# Log the time
-echo "Boot script started at $(date)" >> "$LOG_DIR/boot.log"
+# Wait for wlan0 to be ready (max 20 seconds)
+for i in {1..20}; do
+    if /sbin/iw dev wlan0 info > /dev/null 2>&1; then
+        echo "wlan0 detected."
+        break
+    fi
+    echo "Waiting for wlan0... ($i)"
+    sleep 1
+done
 
-# Run this command as root
-sudo /usr/sbin/iw wlan0 set power_save off
-sudo iw dev wlan0 get power_save
+# Run your commands here
+echo "Disabling Wi-Fi power save"
+sudo /usr/sbin/iw wlan0 set power_save off >> /home/pi/boot.log 2>&1
 EOL
 
 chmod +x "$BOOT_SCRIPT"
