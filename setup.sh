@@ -1,68 +1,78 @@
 #!/bin/bash
-
 set -e
 
-# This script installs the basic software, dependencies, sets up a service to start the server each time 
-# the device is rebooted, etc. For a device with no display, this is sufficient to run the server.
+# G-Shock Server Installer for Raspberry Pi (headless, uv-native, systemd user service)
 
 INSTALL_DIR="$(cd "$(dirname "$0")"; pwd)"
 SERVICE_USER="$(whoami)"
-VENV_DIR="$HOME/venv"
+LAUNCHER="$HOME/.local/bin/start_gshock.sh"
+USER_SYSTEMD_DIR="$HOME/.config/systemd/user"
+SERVICE_FILE="$USER_SYSTEMD_DIR/gshock.service"
 
-echo "== G-Shock Server Installer for Linux =="
+echo "== G-Shock Server Installer =="
 
-# Update & upgrade
-if command -v apt >/dev/null 2>&1; then
-    sudo apt update && sudo apt upgrade -y
-    sudo apt install -y python3-pip python3-venv zip unzip \
-        libfreetype6-dev libjpeg-dev zlib1g-dev libopenjp2-7-dev \
-        libtiff5-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python3-tk
-elif command -v dnf >/dev/null 2>&1; then
-    sudo dnf install -y python3-pip python3-venv zip unzip
-elif command -v yum >/dev/null 2>&1; then
-    sudo yum install -y python3-pip python3-venv zip unzip
-elif command -v pacman >/dev/null 2>&1; then
-    sudo pacman -Sy --noconfirm python-pip python-virtualenv zip unzip
+# Ensure Python3 and Git are available
+if ! command -v python3 >/dev/null 2>&1; then
+    echo "Python3 is required. Please install Python3 first."
+    exit 1
+fi
+if ! command -v git >/dev/null 2>&1; then
+    echo "Git is required. Installing..."
+    sudo apt-get update && sudo apt-get install -y git
 fi
 
-# Setup virtual environment in home directory
-if [ ! -d "$VENV_DIR" ]; then
-  python3 -m venv "$VENV_DIR"
+# Install uv if missing
+if ! command -v uv >/dev/null 2>&1; then
+    echo "Installing uv globally..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    export PATH="$HOME/.local/bin:$PATH"
 fi
-source "$VENV_DIR/bin/activate"
 
-# Install dependencies
-pip install --upgrade pip
-pip install -r "$INSTALL_DIR/requirements.txt"
+# Install dependencies using uv
+echo "== Installing dependencies via uv =="
+cd "$INSTALL_DIR"
+uv sync -q
 
-CONFIG_DIR="$HOME/.config/gshock"
-CONFIG_FILE="$CONFIG_DIR/config.ini"
+# Optional: disable WiFi power-saving
+if command -v iwconfig >/dev/null 2>&1; then
+    echo "Disabling WiFi power-saving..."
+    sudo bash -c 'echo "/sbin/iwconfig wlan0 power off" >> /etc/rc.local'
+else
+    echo "Skipping WiFi power-saving (iwconfig not found)."
+fi
 
-# Disable power-saving mode for the WiFi, otherwize it disconnects after some time.
-echo 'sudo /sbin/iwconfig wlan0 power off' | sudo tee /etc/rc.local > /dev/null
-echo ""
-echo "✅ Installation complete!"
+# Create launcher script that runs server via uv
+mkdir -p "$(dirname "$LAUNCHER")"
+cat > "$LAUNCHER" <<EOL
+#!/bin/bash
+export PATH="\$HOME/.local/bin:\$PATH"
+cd "$INSTALL_DIR"
+uv run gshock_server.py
+EOL
+chmod +x "$LAUNCHER"
 
-# Create and enable systemd service
-SERVICE_FILE="/etc/systemd/system/gshock.service"
-sudo tee "$SERVICE_FILE" > /dev/null <<EOL
+# Create systemd user service
+mkdir -p "$USER_SYSTEMD_DIR"
+cat > "$SERVICE_FILE" <<EOL
 [Unit]
 Description=G-Shock Time Server
 After=network.target
 
 [Service]
-ExecStart=$VENV_DIR/bin/python $INSTALL_DIR/gshock_server.py
-WorkingDirectory=$INSTALL_DIR
-Environment=PYTHONUNBUFFERED=1
+ExecStart=$LAUNCHER
 Restart=on-failure
 RestartSec=5
-User=$SERVICE_USER
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 EOL
 
-sudo systemctl daemon-reload
-sudo systemctl enable gshock.service
-sudo systemctl start gshock.service
-echo "✅ gshock.service installed and started."
+# Enable linger and start service
+loginctl enable-linger "$SERVICE_USER"
+systemctl --user daemon-reload
+systemctl --user enable gshock.service
+systemctl --user start gshock.service
+
+echo "✅ G-Shock server installed and started via systemd user service."
+echo "Manage with: systemctl --user status gshock.service"
+
