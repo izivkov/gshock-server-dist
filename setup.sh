@@ -1,87 +1,68 @@
 #!/bin/bash
+
 set -e
 
-# G-Shock Server Installer for Raspberry Pi (headless, uv-native, systemd user service)
+# This script installs the basic software, dependencies, sets up a service to start the server each time 
+# the device is rebooted, etc. For a device with no display, this is sufficient to run the server.
 
 INSTALL_DIR="$(cd "$(dirname "$0")"; pwd)"
 SERVICE_USER="$(whoami)"
-LAUNCHER="$HOME/.local/bin/start_gshock.sh"
-USER_SYSTEMD_DIR="$HOME/.config/systemd/user"
-SERVICE_FILE="$USER_SYSTEMD_DIR/gshock.service"
+VENV_DIR="$HOME/venv"
 
-echo "== G-Shock Server Installer =="
+echo "== G-Shock Server Installer for Linux =="
 
-# Ensure Python3 and Git are available
-if ! command -v python3 >/dev/null 2>&1; then
-    echo "Python3 is required. Please install Python3 first."
-    exit 1
-fi
-if ! command -v git >/dev/null 2>&1; then
-    echo "Git is required. Installing..."
-    sudo apt-get update && sudo apt-get install -y git
-fi
-
-# Install uv if missing
-if ! command -v uv >/dev/null 2>&1; then
-    echo "Installing uv globally..."
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    export PATH="$HOME/.local/bin:$PATH"
+# Update & upgrade
+if command -v apt >/dev/null 2>&1; then
+    sudo apt update && sudo apt upgrade -y
+    sudo apt install -y python3-pip python3-venv zip unzip \
+        libfreetype6-dev libjpeg-dev zlib1g-dev libopenjp2-7-dev \
+        libtiff5-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python3-tk
+elif command -v dnf >/dev/null 2>&1; then
+    sudo dnf install -y python3-pip python3-venv zip unzip
+elif command -v yum >/dev/null 2>&1; then
+    sudo yum install -y python3-pip python3-venv zip unzip
+elif command -v pacman >/dev/null 2>&1; then
+    sudo pacman -Sy --noconfirm python-pip python-virtualenv zip unzip
 fi
 
-echo "== Installing system dependencies for Pillow and other libs =="
-sudo apt update
-sudo apt install -y \
-  build-essential python3-dev cython3 \
-  libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev \
-  libopenjp2-7-dev libtiff-dev libwebp-dev tcl-dev tk-dev \
-  libdbus-1-dev libglib2.0-dev
-
-# Install dependencies using uv
-echo "== Installing dependencies via uv =="
-cd "$INSTALL_DIR"
-uv pip install numpy==1.26.4
-uv sync -q
-
-# Optional: disable WiFi power-saving
-if command -v iwconfig >/dev/null 2>&1; then
-    echo "Disabling WiFi power-saving..."
-    sudo bash -c 'echo "/sbin/iwconfig wlan0 power off" >> /etc/rc.local'
-else
-    echo "Skipping WiFi power-saving (iwconfig not found)."
+# Setup virtual environment in home directory
+if [ ! -d "$VENV_DIR" ]; then
+  python3 -m venv "$VENV_DIR"
 fi
+source "$VENV_DIR/bin/activate"
 
-# Create launcher script that runs server via uv
-mkdir -p "$(dirname "$LAUNCHER")"
-cat > "$LAUNCHER" <<EOL
-#!/bin/bash
-export PATH="\$HOME/.local/bin:\$PATH"
-cd "$INSTALL_DIR"
-uv run gshock_server.py
-EOL
-chmod +x "$LAUNCHER"
+# Install dependencies
+pip install --upgrade pip
+pip install -r "$INSTALL_DIR/requirements.txt"
 
-# Create systemd user service
-mkdir -p "$USER_SYSTEMD_DIR"
-cat > "$SERVICE_FILE" <<EOL
+CONFIG_DIR="$HOME/.config/gshock"
+CONFIG_FILE="$CONFIG_DIR/config.ini"
+
+# Disable power-saving mode for the WiFi, otherwize it disconnects after some time.
+echo 'sudo /sbin/iwconfig wlan0 power off' | sudo tee /etc/rc.local > /dev/null
+echo ""
+echo "✅ Installation complete!"
+
+# Create and enable systemd service
+SERVICE_FILE="/etc/systemd/system/gshock.service"
+sudo tee "$SERVICE_FILE" > /dev/null <<EOL
 [Unit]
 Description=G-Shock Time Server
 After=network.target
 
 [Service]
-ExecStart=$LAUNCHER
+ExecStart=$VENV_DIR/bin/python $INSTALL_DIR/gshock_server.py
+WorkingDirectory=$INSTALL_DIR
+Environment=PYTHONUNBUFFERED=1
 Restart=on-failure
 RestartSec=5
+User=$SERVICE_USER
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target
 EOL
 
-# Enable linger and start service
-loginctl enable-linger "$SERVICE_USER"
-systemctl --user daemon-reload
-systemctl --user enable gshock.service
-systemctl --user start gshock.service
-
-echo "✅ G-Shock server installed and started via systemd user service."
-echo "Manage with: systemctl --user status gshock.service"
-
+sudo systemctl daemon-reload
+sudo systemctl enable gshock.service
+sudo systemctl start gshock.service
+echo "✅ gshock.service installed and started."
