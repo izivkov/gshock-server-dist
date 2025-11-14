@@ -10,7 +10,7 @@ dependencies = [
     "bleak>=0.22.0",
     "asyncio",
     "pillow",
-    "numpy==2.2.4",
+    # "numpy==1.26.4",
     "requests",
     "configparser",
     "pyserial",
@@ -29,7 +29,7 @@ build-backend = "setuptools.build_meta"
 managed = true
 python-preference = "system"
 cache-dir = "~/.cache/uv"
-extra-index-url = "https://www/piwheels.org/simple"
+extra-index-url = ["https://pypi.org/simple", "https://www.piwheels.org/simple"]
 
 [tool.uv.pip]
 # Optional: enable pip compatibility mode for some edge packages
