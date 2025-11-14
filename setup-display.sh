@@ -1,81 +1,91 @@
 #!/bin/bash
-
-# Installs all display-related dependencies. While installing, it will ask you to select the display type.
-# Note: You need to run both setup.sh and setup-display.sh.
-
 set -e
 
-echo "== Display setup =="
+# G-Shock Display Setup (headless, uv-native, systemd user service)
+
+echo "== G-Shock Display Setup =="
 
 INSTALL_DIR="$(cd "$(dirname "$0")"; pwd)"
-VENV_DIR="$HOME/venv"
 SERVICE_USER="$(whoami)"
+LAUNCHER="$HOME/.local/bin/start_gshock_display.sh"
+USER_SYSTEMD_DIR="$HOME/.config/systemd/user"
+SERVICE_FILE="$USER_SYSTEMD_DIR/gshock_display.service"
 
-# Setup virtual environment in home directory
-if [ ! -d "$VENV_DIR" ]; then
-  python3 -m venv "$VENV_DIR"
+# Ensure Python and basic dependencies exist
+if ! command -v python3 >/dev/null 2>&1; then
+    echo "Python3 is required. Please install it first."
+    exit 1
 fi
-source "$VENV_DIR/bin/activate"
 
-# Update & upgrade
-sudo apt update && sudo apt upgrade -y
-sudo apt install -y python3-pip python3-venv zip unzip swig liblgpio-dev \
-    libfreetype6-dev libjpeg-dev zlib1g-dev libopenjp2-7-dev \
-    libtiff5-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev \
-    python3-tk p7zip-full wget libopenblas-dev
+# Ensure uv CLI is installed (system-wide or user)
+if ! command -v uv >/dev/null 2>&1; then
+    echo "Installing uv CLI..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    export PATH="$HOME/.local/bin:$PATH"
+fi
 
+# Ensure system packages are available
+echo "== Installing required system libraries =="
+sudo apt-get update -qq
+sudo apt install -y \
+  build-essential python3-dev python3-numpy cython3 \
+  libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev \
+  libopenjp2-7-dev libtiff-dev libwebp-dev tcl-dev tk-dev \
+  libdbus-1-dev libglib2.0-dev
+  
 sudo apt-get -y autoremove
 
-# Install Python packages
-pip install --upgrade pip
-pip install spidev smbus smbus2 gpiozero numpy luma.oled luma.lcd lgpio pillow st7789 RPi.GPIO
+# Sync display-related Python dependencies (auto env handled by uv)
+echo "== Installing display-related Python packages with uv =="
+uv sync --quiet
+uv pip install spidev smbus smbus2 gpiozero numpy luma.oled luma.lcd lgpio pillow st7789 RPi.GPIO
 
+# Ask user for display type
 echo "Select your display type:"
 echo "  1) waveshare (default)"
 echo "  2) tft154"
-
 read -p "Enter 1 or 2 [default: 1]: " DISPLAY_CHOICE
 
-# If timed out or invalid input, fall back to default
 if [[ "$DISPLAY_CHOICE" != "2" ]]; then
-  DISPLAY_TYPE="waveshare"
+    DISPLAY_TYPE="waveshare"
 else
-  DISPLAY_TYPE="tft154"
+    DISPLAY_TYPE="tft154"
 fi
-
-# Validate DISPLAY_TYPE
-case "$DISPLAY_TYPE" in
-    waveshare|tft154|mock)
-        ;;
-    *)
-        echo "Error: DISPLAY_TYPE must be one of: waveshare, tft154, mock"
-        exit 1
-        ;;
-esac
 
 echo "Display type set to: $DISPLAY_TYPE"
 
-# Overwrite systemd service with display version
-SERVICE_FILE="/etc/systemd/system/gshock.service"
-sudo tee "$SERVICE_FILE" > /dev/null <<EOL
+# Create launcher script
+mkdir -p "$(dirname "$LAUNCHER")"
+cat > "$LAUNCHER" <<EOL
+#!/bin/bash
+export PATH="\$HOME/.local/bin:\$PATH"
+uv run "$INSTALL_DIR/gshock_server_display.py" --display $DISPLAY_TYPE
+EOL
+chmod +x "$LAUNCHER"
+
+# Create systemd user service
+mkdir -p "$USER_SYSTEMD_DIR"
+cat > "$SERVICE_FILE" <<EOL
 [Unit]
-Description=G-Shock Time Server
+Description=G-Shock Display Server
 After=network.target
 
 [Service]
-ExecStart=$VENV_DIR/bin/python $INSTALL_DIR/gshock_server_display.py --display $DISPLAY_TYPE
-WorkingDirectory=$INSTALL_DIR
-Environment=PYTHONUNBUFFERED=1
+ExecStart=$LAUNCHER
 Restart=on-failure
 RestartSec=5
-User=$SERVICE_USER
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 EOL
 
-sudo systemctl daemon-reload
-sudo systemctl enable gshock.service
-sudo systemctl start gshock.service
+# Enable linger so the service runs without login
+loginctl enable-linger "$SERVICE_USER"
 
-echo "✅ Display setup complete!"
+# Enable and start the service
+systemctl --user daemon-reload
+systemctl --user enable gshock_display.service
+systemctl --user start gshock_display.service
+
+echo "✅ G-Shock display server installed and started (via systemd user service)."
+echo "Manage with: systemctl --user status gshock_display.service"
