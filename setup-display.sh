@@ -39,6 +39,7 @@ sudo apt-get -y autoremove
 
 rm -rf /home/pi/venv
 uv venv --system-site-packages /home/pi/venv
+source /home/pi/venv/bin/activate
 
 # Sync display-related Python dependencies (auto env handled by uv)
 echo "== Installing display-related Python packages with uv =="
