@@ -8,6 +8,7 @@ SERVICE_USER="$(whoami)"
 LAUNCHER="$HOME/.local/bin/start_gshock.sh"
 USER_SYSTEMD_DIR="$HOME/.config/systemd/user"
 SERVICE_FILE="$USER_SYSTEMD_DIR/gshock.service"
+VENV_DIR="$HOME/venv"
 
 echo "== G-Shock Server Installer =="
 
@@ -27,6 +28,12 @@ if ! command -v uv >/dev/null 2>&1; then
     curl -LsSf https://astral.sh/uv/install.sh | sh
     export PATH="$HOME/.local/bin:$PATH"
 fi
+
+# Setup virtual environment in home directory
+if [ ! -d "$VENV_DIR" ]; then
+  uv venv --system-site-packages "$VENV_DIR"
+fi
+source "$VENV_DIR/bin/activate"
 
 echo "== Installing system dependencies for Pillow and other libs =="
 sudo apt update
