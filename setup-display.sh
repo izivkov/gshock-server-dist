@@ -28,6 +28,7 @@ fi
 echo "== Installing required system libraries =="
 sudo apt-get update -qq
 sudo apt install -y \
+  swig liblgpio-dev \
   build-essential python3-dev python3-numpy cython3 \
   libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev \
   libopenjp2-7-dev libtiff-dev libwebp-dev tcl-dev tk-dev \
@@ -38,7 +39,7 @@ sudo apt-get -y autoremove
 # Sync display-related Python dependencies (auto env handled by uv)
 echo "== Installing display-related Python packages with uv =="
 uv sync --quiet
-uv pip install spidev smbus smbus2 gpiozero numpy luma.oled luma.lcd lgpio pillow st7789 RPi.GPIO
+uv pip install spidev smbus smbus2 gpiozero luma.oled luma.lcd lgpio pillow st7789 RPi.GPIO
 
 # Ask user for display type
 echo "Select your display type:"
