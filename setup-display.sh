@@ -27,6 +27,7 @@ fi
 # Ensure system packages are available
 echo "== Installing required system libraries =="
 sudo apt-get update -qq
+
 sudo apt install -y \
   swig liblgpio-dev \
   build-essential python3-dev python3-numpy cython3 \
@@ -35,6 +36,9 @@ sudo apt install -y \
   libdbus-1-dev libglib2.0-dev
   
 sudo apt-get -y autoremove
+
+rm -rf /home/pi/venv
+uv venv --system-site-packages /home/pi/venv
 
 # Sync display-related Python dependencies (auto env handled by uv)
 echo "== Installing display-related Python packages with uv =="
