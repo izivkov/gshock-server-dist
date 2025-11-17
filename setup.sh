@@ -33,7 +33,7 @@ fi
 if [ ! -d "$VENV_DIR" ]; then
   uv venv --system-site-packages "$VENV_DIR"
 fi
-source "$VENV_DIR/bin/activate"
+. "$VENV_DIR/bin/activate"
 
 echo "== Installing system dependencies for Pillow and other libs =="
 sudo apt update
