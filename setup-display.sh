@@ -13,7 +13,7 @@ SERVICE_USER="$(whoami)"
 
 # Setup virtual environment in home directory
 if [ ! -d "$VENV_DIR" ]; then
-  python3 -m venv "$VENV_DIR"
+  uv venv --system-site-packages "$VENV_DIR"
 fi
 source "$VENV_DIR/bin/activate"
 
@@ -22,13 +22,13 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install -y python3-pip python3-venv zip unzip swig liblgpio-dev \
     libfreetype6-dev libjpeg-dev zlib1g-dev libopenjp2-7-dev \
     libtiff5-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev \
-    python3-tk p7zip-full wget libopenblas-dev
+    python3-tk p7zip-full wget libopenblas-dev python3_numpy
 
 sudo apt-get -y autoremove
 
 # Install Python packages
 pip install --upgrade pip
-pip install spidev smbus smbus2 gpiozero numpy luma.oled luma.lcd lgpio pillow st7789 RPi.GPIO
+pip install spidev smbus smbus2 gpiozero luma.oled luma.lcd lgpio pillow st7789 RPi.GPIO
 
 echo "Select your display type:"
 echo "  1) waveshare (default)"
