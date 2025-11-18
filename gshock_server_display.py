@@ -27,7 +27,7 @@ async def main(argv):
     await run_time_server()
 
 def start_dimmer():
-    DimmerService().start(dim_after=30, blank_after=60)
+    DimmerService(dim_after=30, blank_after=60).start()
 
 store = PersistentMap("gshock_server_data.json")
 
