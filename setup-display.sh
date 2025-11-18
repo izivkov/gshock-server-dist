@@ -27,7 +27,7 @@ sudo apt-get update -qq
 
 sudo apt install -y \
   swig liblgpio-dev \
-  build-essential python3-dev python3-numpy cython3 \
+  build-essential python3-dev cython3 \
   libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev \
   libopenjp2-7-dev libtiff-dev libwebp-dev tcl-dev tk-dev \
   libdbus-1-dev libglib2.0-dev
