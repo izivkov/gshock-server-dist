@@ -46,11 +46,11 @@ Type=oneshot
 RemainAfterExit=true
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 EOL
 
 # Enable the service
 sudo systemctl daemon-reload
-sudo systemctl enable user-boot-script.service
+sudo systemctl --user enable user-boot-script.service
 sudo systemctl start user-boot-script.service
 
