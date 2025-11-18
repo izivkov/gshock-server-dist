@@ -2,8 +2,7 @@
 
 set -e
 
-DIST_DIR="gshock-server-dist"
-BOOT_SCRIPT="$DIST_DIR/onboot.sh"
+BOOT_SCRIPT="$HOME/onboot.sh"
 LOG_DIR="$HOME/logs"
 
 tee "$BOOT_SCRIPT" > /dev/null <<EOL
