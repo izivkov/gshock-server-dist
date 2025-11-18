@@ -41,7 +41,7 @@ sudo apt install -y \
   build-essential python3-dev cython3 \
   libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev \
   libopenjp2-7-dev libtiff-dev libwebp-dev tcl-dev tk-dev \
-  libdbus-1-dev libglib2.0-dev coreutils
+  libdbus-1-dev libglib2.0-dev coreutils \
   libopenblas-base libopenblas-dev
 
 # Install dependencies using uv
