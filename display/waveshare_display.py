@@ -7,6 +7,7 @@ class WaveshareDisplay(Display):
         self.width = width
         self.height = height
 
+        print(dir(LCD_1inch3.LCD_1inch3()))
         self.disp = LCD_1inch3.LCD_1inch3()
         self.disp.Init()
         self.disp.clear() 
@@ -29,7 +30,7 @@ class WaveshareDisplay(Display):
         For a 16-bit PWM (0-65535), we scale the percentage.
         """
         print(f"Setting Brightness to {brightness_level}")
-        print(dir(LCD_1inch3.LCD_1inch3()))
+        # print(dir(LCD_1inch3.LCD_1inch3()))
 
         # if 0 <= brightness_level <= 100:
         #     duty_cycle = int(brightness_level * 65535 / 100)
