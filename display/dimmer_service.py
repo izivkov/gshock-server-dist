@@ -44,8 +44,8 @@ class DimmerService:
             # Step 1 → Dim to 10% after 5 min
             if elapsed >= self.dim_after and elapsed < self.blank_after:
                 if self._current_state != "dimmed":
-                    print(f"Setting brightness to {10} percent...")
-                    self.display.set_brightness(10)
+                    print(f"Setting brightness to {50} percent...")
+                    self.display.set_brightness(50)
                     self._current_state = "dimmed"
 
             # Step 2 → Blank screen after 30 min

@@ -26,7 +26,6 @@ class WaveshareDisplay(Display):
 
     def show_status(self, watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync):
         super().show_status(watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync)
-
         self.disp.ShowImage(self.image)
  
     def set_brightness(self, brightness_level):
