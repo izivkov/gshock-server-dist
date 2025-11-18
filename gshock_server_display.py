@@ -57,7 +57,7 @@ def get_display(display_type: str):
 oled = get_display(args.display)
 
 def start_dimmer(display):
-    DimmerService(display, dim_after=30, blank_after=60).start()
+    DimmerService(display, dim_after=10, blank_after=20).start()
 
 start_dimmer(oled)
 
