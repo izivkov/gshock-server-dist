@@ -20,7 +20,7 @@ class WaveshareDisplay(Display):
         self.draw = ImageDraw.Draw(self.image)
 
         # New code
-        BL_PIN = 18
+        BL_PIN = 13
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(bl, GPIO.OUT)
         self.pwm = GPIO.PWM(BL_PIN, 1000)
