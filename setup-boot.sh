@@ -33,7 +33,7 @@ EOL
 chmod +x "$BOOT_SCRIPT"
 
 # Create and enable BOOT service
-BOOT_SERVICE_FILE="$USER_SYSTEMD_DIR/user-boot-script.service"
+BOOT_SERVICE_FILE="/etc/systemd/system/user-boot-script.service"
 sudo tee "$BOOT_SERVICE_FILE" > /dev/null <<EOL
 [Unit]
 Description=Run Pi user’s boot script
@@ -46,12 +46,11 @@ Type=oneshot
 RemainAfterExit=true
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target
 EOL
 
 # Enable the service
-loginctl enable-linger "$SERVICE_USER"
-systemctl --user daemon-reload
-systemctl --user enable user-boot-script.service
-systemctl --user start user-boot-script.service
+sudo systemctl daemon-reload
+sudo systemctl enable user-boot-script.service
+sudo systemctl start user-boot-script.service
 

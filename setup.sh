@@ -67,27 +67,26 @@ EOL
 chmod +x "$LAUNCHER"
 
 # Create systemd user service
-mkdir -p "$USER_SYSTEMD_DIR"
-cat > "$SERVICE_FILE" <<EOL
+SERVICE_FILE="/etc/systemd/system/gshock.service"
+sudo tee "$SERVICE_FILE" > /dev/null <<EOL
 [Unit]
 Description=G-Shock Time Server
 After=network.target
 
 [Service]
-ExecStart=$LAUNCHER
+ExecStart=$VENV_DIR/bin/python $INSTALL_DIR/gshock_server.py
+WorkingDirectory=$INSTALL_DIR
+Environment=PYTHONUNBUFFERED=1
 Restart=on-failure
 RestartSec=5
+User=$SERVICE_USER
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target
 EOL
 
-# Enable linger and start service
-loginctl enable-linger "$SERVICE_USER"
-systemctl --user daemon-reload
-systemctl --user enable gshock.service
-systemctl --user start gshock.service
-
-echo "✅ G-Shock server installed and started via systemd user service."
-echo "Manage with: systemctl --user status gshock.service"
+sudo systemctl daemon-reload
+sudo systemctl enable gshock.service
+sudo systemctl start gshock.service
+echo "✅ gshock.service installed and started."
 

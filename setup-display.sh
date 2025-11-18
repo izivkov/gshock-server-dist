@@ -71,28 +71,27 @@ EOL
 chmod +x "$LAUNCHER"
 
 # Create systemd user service
-mkdir -p "$USER_SYSTEMD_DIR"
-cat > "$SERVICE_FILE" <<EOL
+SERVICE_FILE="/etc/systemd/system/gshock.service"
+sudo tee "$SERVICE_FILE" > /dev/null <<EOL
 [Unit]
-Description=G-Shock Display Server
+Description=G-Shock Time Server
 After=network.target
 
 [Service]
-ExecStart=$LAUNCHER
+ExecStart=$VENV_DIR/bin/python $INSTALL_DIR/gshock_server_display.py --display $DISPLAY_TYPE
+WorkingDirectory=$INSTALL_DIR
+Environment=PYTHONUNBUFFERED=1
 Restart=on-failure
 RestartSec=5
+User=$SERVICE_USER
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target
 EOL
 
-# Enable linger so the service runs without login
-loginctl enable-linger "$SERVICE_USER"
+sudo systemctl daemon-reload
+sudo systemctl enable gshock.service
+sudo systemctl start gshock.service
 
-# Enable and start the service
-systemctl --user daemon-reload
-systemctl --user enable gshock_display.service
-systemctl --user start gshock_display.service
+echo "✅ Display setup complete!"
 
-echo "✅ G-Shock display server installed and started (via systemd user service)."
-echo "Manage with: systemctl --user status gshock_display.service"
