@@ -1,73 +1,62 @@
 #!/bin/bash
+
+# Installs all display-related dependencies. While installing, it will ask you to select the display type.
+# Note: You need to run both setup.sh and setup-display.sh.
+
 set -e
 
-# G-Shock Display Setup (headless, uv-native, systemd user service)
-
-echo "== G-Shock Display Setup =="
+echo "== Display setup =="
 
 INSTALL_DIR="$(cd "$(dirname "$0")"; pwd)"
-LAUNCHER="$HOME/.local/bin/start_gshock_display.sh"
+VENV_DIR="$HOME/venv"
+SERVICE_USER="$(whoami)"
 
-# Ensure Python and basic dependencies exist
-if ! command -v python3 >/dev/null 2>&1; then
-    echo "Python3 is required. Please install it first."
-    exit 1
+# Setup virtual environment in home directory
+if [ ! -d "$VENV_DIR" ]; then
+  python3 -m venv "$VENV_DIR"
 fi
+source "$VENV_DIR/bin/activate"
 
-# Ensure uv CLI is installed (system-wide or user)
-if ! command -v uv >/dev/null 2>&1; then
-    echo "Installing uv CLI..."
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    export PATH="$HOME/.local/bin:$PATH"
-fi
+# Update & upgrade
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y python3-pip python3-venv zip unzip swig liblgpio-dev \
+    libfreetype6-dev libjpeg-dev zlib1g-dev libopenjp2-7-dev \
+    libtiff5-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev \
+    python3-tk p7zip-full wget libopenblas-dev
 
-# Ensure system packages are available
-echo "== Installing required system libraries =="
-sudo apt-get update -qq
-
-sudo apt install -y \
-  swig liblgpio-dev \
-  build-essential python3-dev cython3 \
-  libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev \
-  libopenjp2-7-dev libtiff-dev libwebp-dev tcl-dev tk-dev \
-  libdbus-1-dev libglib2.0-dev
-  
 sudo apt-get -y autoremove
 
-rm -rf /home/pi/venv
-uv venv --system-site-packages /home/pi/venv
-. /home/pi/venv/bin/activate
+# Install Python packages
+pip install --upgrade pip
+pip install --extra-index-url https://www.piwheels.org/simple spidev smbus smbus2 gpiozero numpy luma.oled luma.lcd lgpio pillow st7789 RPi.GPIO
 
-# Sync display-related Python dependencies (auto env handled by uv)
-echo "== Installing display-related Python packages with uv =="
-uv sync --quiet
-# uv pip install spidev smbus smbus2 gpiozero luma.oled luma.lcd lgpio pillow st7789 RPi.GPIO
-uv pip install --extra-index-url https://www.piwheels.org/simple spidev smbus smbus2 gpiozero numpy luma.oled luma.lcd lgpio pillow st7789 RPi.GPIO
 
-# Ask user for display type
 echo "Select your display type:"
 echo "  1) waveshare (default)"
 echo "  2) tft154"
+
 read -p "Enter 1 or 2 [default: 1]: " DISPLAY_CHOICE
 
+# If timed out or invalid input, fall back to default
 if [[ "$DISPLAY_CHOICE" != "2" ]]; then
-    DISPLAY_TYPE="waveshare"
+  DISPLAY_TYPE="waveshare"
 else
-    DISPLAY_TYPE="tft154"
+  DISPLAY_TYPE="tft154"
 fi
+
+# Validate DISPLAY_TYPE
+case "$DISPLAY_TYPE" in
+    waveshare|tft154|mock)
+        ;;
+    *)
+        echo "Error: DISPLAY_TYPE must be one of: waveshare, tft154, mock"
+        exit 1
+        ;;
+esac
 
 echo "Display type set to: $DISPLAY_TYPE"
 
-# Create launcher script
-mkdir -p "$(dirname "$LAUNCHER")"
-cat > "$LAUNCHER" <<EOL
-#!/bin/bash
-export PATH="\$HOME/.local/bin:\$PATH"
-uv run "$INSTALL_DIR/gshock_server_display.py" --display $DISPLAY_TYPE
-EOL
-chmod +x "$LAUNCHER"
-
-# Create systemd user service
+# Overwrite systemd service with display version
 SERVICE_FILE="/etc/systemd/system/gshock.service"
 sudo tee "$SERVICE_FILE" > /dev/null <<EOL
 [Unit]
@@ -91,4 +80,3 @@ sudo systemctl enable gshock.service
 sudo systemctl start gshock.service
 
 echo "✅ Display setup complete!"
-
