@@ -13,7 +13,7 @@ class WaveshareDisplay(Display):
         self.disp = LCD_1inch3.LCD_1inch3()
         self.disp.Init()
         self.disp.clear() 
-        self.disp.bl_DutyCycle(50)
+        self.disp.bl_DutyCycle(0)
 
         self.image = Image.new("RGB", (self.width, self.height), color=0)
         self.black_image = Image.new("RGB", (self.width, self.height), color=0)
