@@ -61,7 +61,7 @@ if [ "$LATEST_TAG" != "$LAST_SYNCED_TAG" ]; then
     uv sync -q
 
     echo "Restarting G-Shock server user service..." | tee -a "$LOG_FILE"
-    systemctl --user restart "$SERVICE_NAME"
+    sudo systemctl restart "$SERVICE_NAME"
 
     echo "✅ Updated to tag $LATEST_TAG at $(date)" | tee -a "$LOG_FILE"
 else
