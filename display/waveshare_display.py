@@ -15,13 +15,14 @@ class WaveshareDisplay(Display):
         self.disp.bl_DutyCycle(10)
 
         self.image = Image.new("RGB", (self.width, self.height), color=0)
+        self.black_image = Image.new("RGB", (self.width, self.height), color=0)
         self.draw = ImageDraw.Draw(self.image)
 
         # New code
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(bl, GPIO.OUT)
-        self.pwm = GPIO.PWM(bl, 1000)
-        self.pwm.start(4)  # full brightness (0–100
+        # GPIO.setmode(GPIO.BCM)
+        # GPIO.setup(bl, GPIO.OUT)
+        # self.pwm = GPIO.PWM(bl, 1000)
+        # self.pwm.start(4)  # full brightness (0–100
 
     def show_status(self, watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync):
         super().show_status(watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync)
@@ -35,4 +36,7 @@ class WaveshareDisplay(Display):
         For a 16-bit PWM (0-65535), we scale the percentage.
         """
         print(f"Setting Brightness to {brightness_level}")
-        self.pwm.ChangeDutyCycle(brightness_level)
+        # self.pwm.ChangeDutyCycle(brightness_level)
+
+        dimmed = Image.blend(self.black_image, self.image, brightness_level)
+        self.disp.ShowImage(dimmed)
