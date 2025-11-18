@@ -4,11 +4,13 @@ version = "1.0.0"
 description = "Headless G-Shock Bluetooth Time Sync Server for Raspberry Pi"
 authors = [{ name = "Ivo Zivkov" }]
 readme = "README.md"
-requires-python = ">=3.10"
+# requires-python = ">=3.10"
 
 dependencies = [
-    "bleak>=1.0.1",
-    "gshock-api>=2.0.31",
+    # "bleak>=1.0.1",
+    # "gshock-api>=2.0.31",
+    "bleak",
+    "gshock-api",
     "asyncio",
     "requests",
     "configparser",
