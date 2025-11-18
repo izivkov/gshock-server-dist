@@ -3,12 +3,13 @@ from display.display import Display
 from PIL import Image, ImageDraw
 import RPi.GPIO as GPIO
 
+from machine import Pin, PWM
+
 class WaveshareDisplay(Display):
     def __init__(self, width=240, height=240, dc=24, rst=25, bl=18, spi_speed_hz=40000000):
         self.width = width
         self.height = height
 
-        print(dir(LCD_1inch3.LCD_1inch3()))
         self.disp = LCD_1inch3.LCD_1inch3()
         self.disp.Init()
         self.disp.clear() 
