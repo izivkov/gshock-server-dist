@@ -13,14 +13,14 @@ class WaveshareDisplay(Display):
         self.disp = LCD_1inch3.LCD_1inch3()
         self.disp.Init()
         self.disp.clear() 
-        self.disp.bl_DutyCycle(10)
+        self.disp.bl_DutyCycle(50)
 
         self.image = Image.new("RGB", (self.width, self.height), color=0)
         self.black_image = Image.new("RGB", (self.width, self.height), color=0)
         self.draw = ImageDraw.Draw(self.image)
 
         # New code
-        BL_PIN = 13
+        BL_PIN = 18
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(BL_PIN, GPIO.OUT)
         self.pwm = GPIO.PWM(BL_PIN, 1000)
