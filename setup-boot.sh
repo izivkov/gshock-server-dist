@@ -50,7 +50,8 @@ WantedBy=default.target
 EOL
 
 # Enable the service
-sudo systemctl daemon-reload
-sudo systemctl --user enable user-boot-script.service
-sudo systemctl start user-boot-script.service
+loginctl enable-linger "$SERVICE_USER"
+systemctl --user daemon-reload
+systemctl --user enable user-boot-script.service
+systemctl --user start user-boot-script.service
 
