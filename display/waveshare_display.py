@@ -37,6 +37,11 @@ class WaveshareDisplay(Display):
                 for dc in range(100, -1, -1):
                     self.pwm.ChangeDutyCycle(dc)
                     time.sleep(0.01)
+                    
+        except KeyboardInterrupt:
+            # Clean up GPIO settings on Ctrl+C exit
+            self.pwm.stop()
+            GPIO.cleanup()
 
     def show_status(self, watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync):
         super().show_status(watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync)
