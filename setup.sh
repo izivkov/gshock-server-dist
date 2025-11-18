@@ -42,6 +42,7 @@ sudo apt install -y \
   libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev \
   libopenjp2-7-dev libtiff-dev libwebp-dev tcl-dev tk-dev \
   libdbus-1-dev libglib2.0-dev coreutils
+  libopenblas-base libopenblas-dev
 
 # Install dependencies using uv
 echo "== Installing dependencies via uv =="
