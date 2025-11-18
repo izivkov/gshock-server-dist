@@ -8,7 +8,6 @@ SERVICE_USER="$(whoami)"
 LAUNCHER="$HOME/.local/bin/start_gshock.sh"
 USER_SYSTEMD_DIR="$HOME/.config/systemd/user"
 SERVICE_FILE="$USER_SYSTEMD_DIR/gshock.service"
-# SERVICE_FILE="/etc/systemd/system/gshock.service"
 VENV_DIR="$HOME/venv"
 
 echo "== G-Shock Server Installer =="
