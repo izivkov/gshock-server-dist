@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-BOOT_SCRIPT="$HOME/onboot.sh"
+BOOT_SCRIPT="$DIST_DIR/onboot.sh"
 LOG_DIR="$HOME/logs"
 
 tee "$BOOT_SCRIPT" > /dev/null <<EOL
