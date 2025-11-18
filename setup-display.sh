@@ -6,10 +6,7 @@ set -e
 echo "== G-Shock Display Setup =="
 
 INSTALL_DIR="$(cd "$(dirname "$0")"; pwd)"
-SERVICE_USER="$(whoami)"
 LAUNCHER="$HOME/.local/bin/start_gshock_display.sh"
-USER_SYSTEMD_DIR="$HOME/.config/systemd/user"
-SERVICE_FILE="$USER_SYSTEMD_DIR/gshock_display.service"
 
 # Ensure Python and basic dependencies exist
 if ! command -v python3 >/dev/null 2>&1; then
