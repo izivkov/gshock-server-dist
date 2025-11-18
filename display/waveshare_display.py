@@ -20,3 +20,14 @@ class WaveshareDisplay(Display):
 
         self.disp.ShowImage(self.image)
  
+    def set_brightness(self, brightness_percent):
+        """
+        Set brightness duty cycle for the display.
+        brightness_percent: int or float between 0 and 100
+        """
+        # Clamp brightness value
+        brightness_percent = max(0, min(100, brightness_percent))
+        # Convert percent (0-100) to duty cycle scale (e.g. 0-255 or 0-100)
+        # Assuming self.disp.bl_DutyCycle accepts 0-100 scale
+        duty_cycle = int(brightness_percent)
+        self.disp.bl_DutyCycle(duty_cycle)
