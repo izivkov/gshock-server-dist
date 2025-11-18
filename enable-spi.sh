@@ -26,9 +26,9 @@ else
 fi
 
 # Check if spidev is installed
-if ! pip3 show spidev > /dev/null 2>&1; then
+if ! pip show spidev > /dev/null 2>&1; then
     echo "Installing Python spidev module..."
-    pip3 install spidev
+    uv pip install spidev
 else
     echo "Python spidev module already installed."
 fi
