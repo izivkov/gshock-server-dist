@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -e
+
+DIST_DIR="gshock-server-dist"
 BOOT_SCRIPT="$DIST_DIR/onboot.sh"
 LOG_DIR="$HOME/logs"
 
