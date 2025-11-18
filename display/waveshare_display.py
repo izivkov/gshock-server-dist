@@ -21,7 +21,7 @@ class WaveshareDisplay(Display):
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(bl, GPIO.OUT)
         self.pwm = GPIO.PWM(bl, 1000)
-        self.pwm.start(100)  # full brightness (0–100
+        self.pwm.start(4)  # full brightness (0–100
 
     def show_status(self, watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync):
         super().show_status(watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync)
