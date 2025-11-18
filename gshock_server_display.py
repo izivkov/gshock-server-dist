@@ -23,11 +23,7 @@ __license__ = "MIT"
 # This script is used to set the time on a G-Shock watch and display information on a connected display.
 
 async def main(argv):
-    start_dimmer()
     await run_time_server()
-
-def start_dimmer():
-    DimmerService(dim_after=30, blank_after=60).start()
 
 store = PersistentMap("gshock_server_data.json")
 
@@ -59,6 +55,11 @@ def get_display(display_type: str):
         raise ValueError(f"Unsupported display type: {display_type}")
 
 oled = get_display(args.display)
+
+def start_dimmer(display):
+    DimmerService(display, dim_after=30, blank_after=60).start()
+
+start_dimmer(oled)
 
 def get_next_alarm_time(alarms):
     now = datetime.now()
