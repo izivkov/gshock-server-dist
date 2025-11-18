@@ -26,6 +26,20 @@ class WaveshareDisplay(Display):
         self.pwm = GPIO.PWM(BL_PIN, 1000)
         self.pwm.start(0)  # full brightness (0–100
 
+
+    def show_status(self, watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync):
+        super().show_status(watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync)
+        self.disp.ShowImage(self.image)
+ 
+    def set_brightness(self, brightness_level):
+        """
+        Sets the backlight brightness using PWM.
+        brightness_level should be an integer between 0 (off) and 100 (max brightness).
+        For a 16-bit PWM (0-65535), we scale the percentage.
+        """
+        print(f"Setting Brightness to {brightness_level}")
+        # self.pwm.ChangeDutyCycle(brightness_level)
+
         try:
             while True:
                 # Fade in (duty cycle from 0 to 100)
@@ -43,15 +57,3 @@ class WaveshareDisplay(Display):
             self.pwm.stop()
             GPIO.cleanup()
 
-    def show_status(self, watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync):
-        super().show_status(watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync)
-        self.disp.ShowImage(self.image)
- 
-    def set_brightness(self, brightness_level):
-        """
-        Sets the backlight brightness using PWM.
-        brightness_level should be an integer between 0 (off) and 100 (max brightness).
-        For a 16-bit PWM (0-65535), we scale the percentage.
-        """
-        print(f"Setting Brightness to {brightness_level}")
-        self.pwm.ChangeDutyCycle(brightness_level)
