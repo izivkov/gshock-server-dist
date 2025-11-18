@@ -22,7 +22,7 @@ class WaveshareDisplay(Display):
         # New code
         BL_PIN = 13
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(bl, GPIO.OUT)
+        GPIO.setup(BL_PIN, GPIO.OUT)
         self.pwm = GPIO.PWM(BL_PIN, 1000)
         self.pwm.start(0)  # full brightness (0–100
 
