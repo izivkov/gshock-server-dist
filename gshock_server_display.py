@@ -14,7 +14,7 @@ from gshock_api.watch_info import watch_info
 from utils import run_once_key
 from peristent_store import PersistentMap
 from gshock_api.always_connected_watch_filter import always_connected_watch_filter as watch_filter
-
+from display import DimmerService
 
 __author__ = "Ivo Zivkov"
 __copyright__ = "Ivo Zivkov"
@@ -23,7 +23,11 @@ __license__ = "MIT"
 # This script is used to set the time on a G-Shock watch and display information on a connected display.
 
 async def main(argv):
+    start_dimmer()
     await run_time_server()
+
+def start_dimmer():
+    DimmerService().start(dim_after=30, blank_after=60)
 
 store = PersistentMap("gshock_server_data.json")
 
