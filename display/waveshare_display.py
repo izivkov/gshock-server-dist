@@ -3,7 +3,7 @@ from display.display import Display
 from PIL import Image, ImageDraw
 import RPi.GPIO as GPIO
 
-from machine import Pin, PWM
+import time
 
 class WaveshareDisplay(Display):
     def __init__(self, width=240, height=240, dc=24, rst=25, bl=18, spi_speed_hz=40000000):
@@ -24,7 +24,19 @@ class WaveshareDisplay(Display):
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(bl, GPIO.OUT)
         self.pwm = GPIO.PWM(BL_PIN, 1000)
-        self.pwm.start(100)  # full brightness (0–100
+        self.pwm.start(0)  # full brightness (0–100
+
+        try:
+            while True:
+                # Fade in (duty cycle from 0 to 100)
+                for dc in range(0, 101, 1):
+                    self.pwm.ChangeDutyCycle(dc)
+                    time.sleep(0.01)
+
+                # Fade out (duty cycle from 100 to 0)
+                for dc in range(100, -1, -1):
+                    self.pwm.ChangeDutyCycle(dc)
+                    time.sleep(0.01)
 
     def show_status(self, watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync):
         super().show_status(watch_name, battery, temperature, last_sync, alarm, reminder, auto_sync)
