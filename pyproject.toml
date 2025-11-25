@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "GShockTimeServer"
+version = "1.0.0"
+description = "Python script to update time on GShock Watches using BLE"
+readme = "README.md"
+authors = [{ name = "Ivo Zivkov", email = "izivkov@gmail.com" }]
+dependencies = [
+    "bleak>=1.0.1",
+    "gshock-api>=2.0.34",
+    "pytz>=2025.2",
+    "requests",
+]
+license = "MIT"
+license-files = ["LICENSE*"]
+requires-python = ">=3.12"
+
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python :: 3"
+]
+
+[project.urls]
+Documentation = "https://pyscaffold.org/"
+
+[project.optional-dependencies]
+testing = ["setuptools", "pytest", "pytest-cov"]
