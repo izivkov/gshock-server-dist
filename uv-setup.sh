@@ -5,17 +5,16 @@ set -e
 # Change to the project root directory containing pyproject.toml and requirements.txt
 cd "$(dirname "$0")"
 
-# Check if uv is installed, if not install it using pip or the official installer
+# Update package list and install system dependencies needed for building Python packages
+sudo apt-get update
+sudo apt-get install -y build-essential python3-venv python3-pip curl
+
+# Check if uv is installed, if not install it using the official install script
 if ! command -v uv &> /dev/null
 then
     echo "uv not found, installing uv..."
-    # Option 1: Install uv using pip (requires python and pip installed)
-    # pip install --user uv
-
-    # Alternatively, you can use the official install script for macOS/Linux:
     curl -LsSf https://astral.sh/uv/install.sh | sh
-
-    # Make sure ~/.local/bin is in PATH for pip user installs:
+    # Add uv to PATH for this session
     export PATH="$HOME/.local/bin:$PATH"
 fi
 
@@ -24,4 +23,3 @@ rm -rf .venv
 
 # Install dependencies from requirements.txt using uv (creates .venv automatically)
 uv add -r requirements.txt
-
