@@ -4,7 +4,6 @@ set -e
 BOOT_SCRIPT="$HOME/onboot.sh"
 LOG_DIR="$HOME/logs"
 
-tee "$BOOT_SCRIPT" > /dev/null <<EOL
 #!/bin/bash
 
 # Unblock all rfkill (WiFi, Bluetooth, etc.)
