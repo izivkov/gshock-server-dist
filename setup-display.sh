@@ -9,7 +9,6 @@ set -x
 echo "== Display setup =="
 
 INSTALL_DIR="$(cd "$(dirname "$0")"; pwd)"
-VENV_DIR="$HOME/venv"
 SERVICE_USER="$(whoami)"
 
 #!/bin/bash
@@ -34,8 +33,7 @@ fi
 
 # Remove any previous virtual environment to ensure clean state
 rm -rf .venv
-
-/home/pi/.local/bin/uv add --extra-index-url https://www.piwheels.org/simple --index-strategy unsafe-best-match spidev smbus smbus2 gpiozero numpy luma.oled luma.lcd lgpio pillow st7789 RPi.GPIO
+uv add --extra-index-url https://www.piwheels.org/simple --index-strategy unsafe-best-match spidev smbus smbus2 gpiozero numpy luma.oled luma.lcd lgpio pillow st7789 RPi.GPIO
 
 echo "Select your display type:"
 echo "  1) waveshare (default)"
