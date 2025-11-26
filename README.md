@@ -1,2 +1,2 @@
-This repostory is used to hold the distribution files for `GShockTimeServer` repository:
+This repository holds distribution files for the `GShockTimeServer` project:
 https://github.com/izivkov/GShockTimeServer
