@@ -1,7 +1,8 @@
 import asyncio
 import sys
+import time
 from datetime import datetime, timedelta
-from typing import List, Tuple, Callable, Optional
+from typing import List, Tuple
 
 from gshock_api.connection import Connection
 from gshock_api.gshock_api import GshockAPI
