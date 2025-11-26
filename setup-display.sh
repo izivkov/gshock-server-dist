@@ -16,8 +16,7 @@ SERVICE_USER="$(whoami)"
 set -x
 set -e
 
-# Change to project root directory (adjust if needed)
-cd "$(dirname "$0")"
+cd=$HOME/gshock-server-dist
 
 # Update apt and install required system packages for building and runtime
 sudo apt-get update
@@ -36,6 +35,7 @@ fi
 # Remove any previous virtual environment to ensure clean state
 rm -rf .venv
 
+uv init
 /home/pi/.local/bin/uv add --extra-index-url https://www.piwheels.org/simple --index-strategy unsafe-best-match spidev smbus smbus2 gpiozero numpy luma.oled luma.lcd lgpio pillow st7789 RPi.GPIO
 
 echo "Select your display type:"
