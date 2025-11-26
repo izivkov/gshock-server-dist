@@ -44,5 +44,4 @@ else
     echo "No changes made. No reboot needed."
 fi
 echo "== SPI setup complete! =="
-chmod +x "$DIST_DIR/enable-spi.sh"
 echo "enable-spi.sh has been created and made executable."
