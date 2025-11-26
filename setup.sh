@@ -1,42 +1,28 @@
 #!/bin/bash
-
+set -x
 set -e
 
-# This script installs the basic software, dependencies, sets up a service to start the server each time 
-# the device is rebooted, etc. For a device with no display, this is sufficient to run the server.
+# Change to the project root directory containing pyproject.toml and requirements.txt
+cd "$(dirname "$0")"
 
-INSTALL_DIR="$(cd "$(dirname "$0")"; pwd)"
-SERVICE_USER="$(whoami)"
-VENV_DIR="$HOME/venv"
+# Update package list and install system dependencies needed for building Python packages
+sudo apt-get update
+sudo apt-get install -y build-essential python3-dev python3-venv python3-pip curl libffi-dev
 
-echo "== G-Shock Server Installer for Linux =="
-
-# Update & upgrade
-if command -v apt >/dev/null 2>&1; then
-    sudo apt update && sudo apt upgrade -y
-    sudo apt install -y python3-pip python3-venv zip unzip \
-        libfreetype6-dev libjpeg-dev zlib1g-dev libopenjp2-7-dev \
-        libtiff5-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python3-tk
-elif command -v dnf >/dev/null 2>&1; then
-    sudo dnf install -y python3-pip python3-venv zip unzip
-elif command -v yum >/dev/null 2>&1; then
-    sudo yum install -y python3-pip python3-venv zip unzip
-elif command -v pacman >/dev/null 2>&1; then
-    sudo pacman -Sy --noconfirm python-pip python-virtualenv zip unzip
+# Check if uv is installed, if not install it using the official install script
+if ! command -v uv &> /dev/null
+then
+    echo "uv not found, installing uv..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    # Add uv to PATH for this session
+    export PATH="$HOME/.local/bin:$PATH"
 fi
 
-# Setup virtual environment in home directory
-if [ ! -d "$VENV_DIR" ]; then
-  python3 -m venv "$VENV_DIR"
-fi
-source "$VENV_DIR/bin/activate"
+# Remove old or broken .venv directory to start fresh
+rm -rf .venv
 
-# Install dependencies
-pip install --upgrade pip
-pip install -r "$INSTALL_DIR/requirements.txt"
-
-CONFIG_DIR="$HOME/.config/gshock"
-CONFIG_FILE="$CONFIG_DIR/config.ini"
+# Install dependencies from requirements.txt using uv (creates .venv automatically)
+uv add -r requirements.txt
 
 # Disable power-saving mode for the WiFi, otherwize it disconnects after some time.
 echo 'sudo /sbin/iwconfig wlan0 power off' | sudo tee /etc/rc.local > /dev/null
@@ -45,21 +31,30 @@ echo "✅ Installation complete!"
 
 # Create and enable systemd service
 SERVICE_FILE="/etc/systemd/system/gshock.service"
+INSTALL_DIR="$(cd "$(dirname "$0")"; pwd)"
+SERVICE_USER="$(whoami)"
+
 sudo tee "$SERVICE_FILE" > /dev/null <<EOL
+
 [Unit]
 Description=G-Shock Time Server
 After=network.target
 
 [Service]
-ExecStart=$VENV_DIR/bin/python $INSTALL_DIR/gshock_server.py
-WorkingDirectory=$INSTALL_DIR
+Type=simple
+
+# Run as your user (recommended)
+User=$SERVICE_USER
+WorkingDirectory=$HOME/gshock-server-dist
+ExecStart=$HOME/.local/bin/uv run gshock_server.py
 Environment=PYTHONUNBUFFERED=1
+
+# Restart on crashes
 Restart=on-failure
 RestartSec=5
-User=$SERVICE_USER
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=multi-user.targe
 EOL
 
 sudo systemctl daemon-reload
