@@ -7,6 +7,7 @@ cd "$(dirname "$0")"
 
 # Update package list and install system dependencies needed for building Python packages
 sudo apt-get update
+sudo apt-get upgrade
 sudo apt-get install -y build-essential python3-dev python3-venv python3-pip curl libffi-dev
 
 # Check if uv is installed, if not install it using the official install script

@@ -35,29 +35,7 @@ fi
 rm -rf .venv
 uv add --extra-index-url https://www.piwheels.org/simple --index-strategy unsafe-best-match spidev smbus smbus2 gpiozero numpy luma.oled luma.lcd lgpio pillow st7789 RPi.GPIO
 
-echo "Select your display type:"
-echo "  1) waveshare (default)"
-echo "  2) tft154"
-
-read -p "Enter 1 or 2 [default: 1]: " DISPLAY_CHOICE
-
-# If timed out or invalid input, fall back to default
-if [[ "$DISPLAY_CHOICE" != "2" ]]; then
-  DISPLAY_TYPE="waveshare"
-else
-  DISPLAY_TYPE="tft154"
-fi
-
-# Validate DISPLAY_TYPE
-case "$DISPLAY_TYPE" in
-    waveshare|tft154|mock)
-        ;;
-    *)
-        echo "Error: DISPLAY_TYPE must be one of: waveshare, tft154, mock"
-        exit 1
-        ;;
-esac
-
+DISPLAY_TYPE="waveshare"
 echo "Display type set to: $DISPLAY_TYPE"
 
 # Overwrite systemd service with display version
