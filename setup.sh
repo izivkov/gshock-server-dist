@@ -46,7 +46,7 @@ Type=simple
 # Run as your user (recommended)
 User=$SERVICE_USER
 WorkingDirectory=$HOME/gshock-server-dist
-ExecStart=$HOME/.local/bin/uv run src/gshock-server/gshock_server.py
+ExecStart=$HOME/.local/bin/uv run gshock_server.py
 Environment=PYTHONUNBUFFERED=1
 
 # Restart on crashes
