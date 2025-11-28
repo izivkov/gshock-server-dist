@@ -27,7 +27,7 @@ fi
 
 # Install display dependencies into the existing .venv
 # We use 'uv pip install' to avoid modifying pyproject.toml on the device
-uv pip install --extra-index-url https://www.piwheels.org/simple spidev smbus smbus2 gpiozero numpy luma.oled luma.lcd lgpio pillow st7789 RPi.GPIO
+$HOME/.local/bin/uv pip install --extra-index-url https://www.piwheels.org/simple spidev smbus smbus2 gpiozero numpy luma.oled luma.lcd lgpio pillow st7789 RPi.GPIO
 
 DISPLAY_TYPE="waveshare"
 echo "Display type set to: $DISPLAY_TYPE"
