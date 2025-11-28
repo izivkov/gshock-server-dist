@@ -37,9 +37,9 @@ else
 fi
 
 # Check if spidev is installed
-if ! uv pip show spidev > /dev/null 2>&1; then
+if ! $HOME/.local/bin/uv pip show spidev > /dev/null 2>&1; then
     echo "Installing Python spidev module..."
-    uv pip install spidev
+    $HOME/.local/bin/uv pip install spidev
 else
     echo "Python spidev module already installed."
 fi
