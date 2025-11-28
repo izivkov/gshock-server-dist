@@ -11,12 +11,6 @@ echo "== Display setup =="
 INSTALL_DIR="$(cd "$(dirname "$0")"; pwd)"
 SERVICE_USER="$(whoami)"
 
-#!/bin/bash
-set -x
-set -e
-
-cd=$HOME/gshock-server-dist
-
 # Update apt and install required system packages for building and runtime
 sudo apt-get update
 sudo apt-get install -y \
@@ -31,9 +25,9 @@ if ! grep -q "extra-index-url=https://www.piwheels.org/simple" /etc/pip.conf; th
     echo "extra-index-url=https://www.piwheels.org/simple" | sudo tee -a /etc/pip.conf
 fi
 
-# Remove any previous virtual environment to ensure clean state
-rm -rf .venv
-uv add --extra-index-url https://www.piwheels.org/simple --index-strategy unsafe-best-match spidev smbus smbus2 gpiozero numpy luma.oled luma.lcd lgpio pillow st7789 RPi.GPIO
+# Install display dependencies into the existing .venv
+# We use 'uv pip install' to avoid modifying pyproject.toml on the device
+uv pip install --extra-index-url https://www.piwheels.org/simple spidev smbus smbus2 gpiozero numpy luma.oled luma.lcd lgpio pillow st7789 RPi.GPIO
 
 DISPLAY_TYPE="waveshare"
 echo "Display type set to: $DISPLAY_TYPE"
@@ -51,7 +45,7 @@ Type=simple
 # Run as your user (recommended)
 User=$SERVICE_USER
 WorkingDirectory=$HOME/gshock-server-dist
-ExecStart=$HOME/.local/bin/uv run gshock_server_display.py --display $DISPLAY_TYPE
+ExecStart=$HOME/.local/bin/uv run src/gshock-server/gshock_server_display.py --display $DISPLAY_TYPE
 Environment=PYTHONUNBUFFERED=1
 
 # Restart on crashes
